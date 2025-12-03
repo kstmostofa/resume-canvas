@@ -21,7 +21,7 @@ export function Hero() {
               className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-sm font-medium text-primary mb-6"
             >
               <Sparkles className="mr-2 h-4 w-4" />
-              <span>Open Source Resume Builder</span>
+              <span>Resume Canvas - Open Source Resume Builder</span>
             </motion.div>
 
             <motion.h1
@@ -67,7 +67,7 @@ export function Hero() {
                 className="h-12 px-8 text-base hover:bg-primary/5"
               >
                 <Link
-                  href="https://github.com/yourusername/open-resume"
+                  href="https://github.com/kstmostofa/resume-canvas"
                   target="_blank"
                 >
                   <Github className="inline-block mr-2 h-5 w-5" />

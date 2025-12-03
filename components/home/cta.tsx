@@ -79,7 +79,7 @@ export function CTA() {
                 className="h-14 px-8 text-lg font-semibold text-primary shadow-lg bg-zinc-200 hover:shadow-xl transition-all hover:-translate-y-1 hover:bg-zinc-300"
               >
                 <Link
-                  href="https://github.com/yourusername/open-resume"
+                  href="https://github.com/kstmostofa/resume-canvas"
                   target="_blank"
                 >
                   <Github className="inline-block mr-2 h-5 w-5" />

@@ -31,9 +31,9 @@ const footerLinks = [
 ];
 
 const socialLinks = [
-  { icon: Github, href: "https://github.com", label: "GitHub" },
-  { icon: Twitter, href: "https://twitter.com", label: "Twitter" },
-  { icon: Linkedin, href: "https://linkedin.com", label: "LinkedIn" },
+  { icon: Github, href: "https://github.com/kstmostofa/resume-canvas", label: "GitHub" },
+  { icon: Twitter, href: "https://x.com/Mostofa_Me", label: "Twitter" },
+  { icon: Linkedin, href: "https://www.linkedin.com/in/mostofa-me", label: "LinkedIn" },
   { icon: Mail, href: "mailto:hello@example.com", label: "Email" },
 ];
 
@@ -89,7 +89,7 @@ export function Footer() {
         </div>
 
         <div className="mt-12 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-muted-foreground">
-          <p>© {new Date().getFullYear()} OpenResume. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Resume Canvas. All rights reserved.</p>
           <p>
             Built with <span className="text-red-500">♥</span> by the Open
             Source Community
