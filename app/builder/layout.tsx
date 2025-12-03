@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
 import { Fragment } from "react/jsx-runtime";
-import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Open Source Resume Builder",
-  description:
-    "Create and customize your resume with ease using our open-source resume builder.",
+    title: "Resume Canvas | Open Source Resume Builder",
+    description:
+        "Create and customize your resume with ease using Resume Canvas, the open-source resume builder.",
 };
 
 export default function BuilderLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return <Fragment>{children}</Fragment>;
+    return <Fragment>{children}</Fragment>;
 }

@@ -10,9 +10,9 @@ const khand = Khand({
 });
 
 export const metadata: Metadata = {
-  title: "Open Source Resume Builder",
+  title: "Resume Canvas | Open Source Resume Builder",
   description:
-    "Create and customize your resume with ease using our open-source resume builder.",
+    "Create and customize your resume with ease using Resume Canvas, the open-source resume builder.",
 };
 
 export default function RootLayout({
