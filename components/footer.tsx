@@ -47,7 +47,7 @@ export function Footer() {
               href="/"
               className="flex items-center gap-2 font-bold text-xl mb-4"
             >
-              <span className="text-primary">Open</span>Resume
+              <span className="text-primary">Resume</span>Canvas
             </Link>
             <p className="text-muted-foreground mb-6 max-w-sm">
               The free and open-source resume builder. Create professional
