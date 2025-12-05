@@ -3,8 +3,9 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { useResumeStore } from "@/lib/store/useResumeStore";
-import { X } from "lucide-react";
+import { X, Upload, User, Trash2 } from "lucide-react";
 import Image from "next/image";
 import { useRef } from "react";
 
@@ -40,38 +41,59 @@ export function PersonalInfoForm() {
         <div className="bg-card border rounded-2xl p-6">
             <h4 className="text-lg font-semibold mb-4">Personal Information</h4>
             <div className="space-y-4">
-                <div className="space-y-2">
+                <div className="space-y-3">
                     <Label>Profile Photo</Label>
-                    <div className="flex items-center gap-4">
-                        {personalInfo.photoUrl && (
-                            <div className="relative w-16 h-16 rounded-full overflow-hidden border shrink-0">
-                                <Image
-                                    src={personalInfo.photoUrl}
-                                    alt="Profile"
-                                    className="w-full h-full object-cover"
-                                    width={64}
-                                    height={64}
-                                />
-                                <button
-                                    onClick={handleRemovePhoto}
-                                    className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity"
-                                    type="button"
-                                >
-                                    <X className="w-4 h-4 text-white" />
-                                </button>
+                    <div className="flex items-center gap-6 p-4 border border-dashed rounded-lg bg-muted/30">
+                        <div className="relative shrink-0">
+                            <div className="w-20 h-20 rounded-xl overflow-hidden border-2  bg-background flex items-center justify-center">
+                                {personalInfo.photoUrl ? (
+                                    <Image
+                                        src={personalInfo.photoUrl}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover"
+                                        width={80}
+                                        height={80}
+                                    />
+                                ) : (
+                                    <User className="w-8 h-8 text-muted-foreground/50" />
+                                )}
                             </div>
-                        )}
-                        <div className="flex-1">
-                            <Input
+                        </div>
+                        <div className="flex-1 space-y-2">
+                            <div className="flex items-center gap-2">
+                                <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="h-9"
+                                >
+                                    <Upload className="w-4 h-4 mr-2" />
+                                    Upload Photo
+                                </Button>
+                                {personalInfo.photoUrl && (
+                                    <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={handleRemovePhoto}
+                                        className="h-9 text-muted-foreground hover:text-destructive"
+                                    >
+                                        <Trash2 className="w-4 h-4 mr-2" />
+                                        Remove
+                                    </Button>
+                                )}
+                            </div>
+                            <p className="text-[11px] text-muted-foreground">
+                                Recommended: Square JPG or PNG, max 2MB.
+                            </p>
+                            <input
                                 ref={fileInputRef}
                                 type="file"
                                 accept="image/*"
                                 onChange={handlePhotoUpload}
-                                className="cursor-pointer"
+                                className="hidden"
                             />
-                            <p className="text-xs text-gray-500 mt-1">
-                                Recommended: Square JPG or PNG, max 2MB.
-                            </p>
                         </div>
                     </div>
                 </div>

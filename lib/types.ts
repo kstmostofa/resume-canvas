@@ -21,6 +21,7 @@ export interface Experience {
     endDate: string;
     current: boolean;
     description: string; // HTML or Markdown or plain text with newlines
+    bulletStyle?: string;
 }
 
 export interface Education {

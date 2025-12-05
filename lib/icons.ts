@@ -12,7 +12,9 @@ export const getIconComponent = (name: string): LucideIcon | null => {
 };
 
 export const socialIcons = [
-    "Github", "Linkedin", "Twitter", "Facebook", "Instagram", "Youtube", "Globe", "Mail", "Phone", "MapPin", "Briefcase", "Link", "ExternalLink"
+    "Github", "Linkedin", "Twitter", "Facebook", "Instagram", "Youtube", "Globe", "Mail", "Phone", "MapPin", "Briefcase", "Link", "ExternalLink",
+    "Twitch", "Gitlab", "Dribbble", "Figma", "Codepen", "Slack",
+    "Code", "Terminal", "PenTool", "MessageCircle", "Gamepad2", "Hash", "Layers"
 ];
 
 export const strengthIcons = [

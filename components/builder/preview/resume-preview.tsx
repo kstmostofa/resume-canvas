@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
+import { useTheme } from "next-themes";
 import {
     Download,
     Printer,
@@ -13,43 +14,122 @@ import {
     User,
     Linkedin,
     Twitter,
+    Circle,
+    Square,
+    Check,
+    ArrowRight,
+    ChevronRight,
+    Diamond,
+    Star,
+    Minus,
+    Moon,
+    Sun,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useResumeStore } from "@/lib/store/useResumeStore";
 import { getIconComponent } from "@/lib/icons";
 import Image from "next/image";
 import { darkenColor } from "@/lib/utils";
+import { Social } from "@/lib/types";
 
 export function ResumePreview() {
     const { resumeData, settings } = useResumeStore();
+    const { theme, setTheme } = useTheme();
     const contentRef = useRef<HTMLDivElement>(null);
     const [isDownloading, setIsDownloading] = useState(false);
-    const [isPrinting, setIsPrinting] = useState(false);
-    const reactToPrintFn = useReactToPrint({ contentRef });
+    const [downloadProgress, setDownloadProgress] = useState(0);
+
+    const reactToPrintFn = useReactToPrint({
+        contentRef,
+        pageStyle: `
+            @page {
+                size: ${settings.documentSize === "Letter" ? "letter" : "auto"};
+                margin: 0mm;
+            }
+            @media print {
+                body {
+                    -webkit-print-color-adjust: exact;
+                    print-color-adjust: exact;
+                }
+                .print-content {
+                    transform: none !important;
+                    box-shadow: none !important;
+                    margin: 0 !important;
+                }
+            }
+        `
+    });
 
     const handleDownloadPdf = async () => {
         if (!contentRef.current) return;
         setIsDownloading(true);
+        setDownloadProgress(0);
+
+        // Give React time to render the loading state
+        await new Promise(resolve => setTimeout(resolve, 100));
+
         try {
-            const html2pdf = (await import("html2pdf.js")).default;
-            const opt = {
-                margin: 0,
-                filename: `${resumeData.personalInfo.fullName.replace(/\s+/g, "_")}_Resume.pdf`,
-                image: { type: "jpeg" as const, quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: "mm", format: settings.documentSize === "Letter" ? "letter" : "a4", orientation: "portrait" as const }
-            };
-            await html2pdf().set(opt).from(contentRef.current).save();
+            setDownloadProgress(10);
+            const { toPng } = await import("html-to-image");
+            const { jsPDF } = await import("jspdf");
+
+            // Wait for fonts to load
+            await document.fonts.ready;
+            setDownloadProgress(30);
+
+            // Get the element dimensions
+            const element = contentRef.current;
+
+            // Generate high-quality PNG
+            const dataUrl = await toPng(element, {
+                quality: 1.0,
+                pixelRatio: 5, // Increased resolution
+                backgroundColor: '#ffffff',
+                style: {
+                    transform: 'scale(1)',
+                    boxShadow: 'none',
+                    margin: '0',
+                }
+            });
+            setDownloadProgress(60);
+
+            // Calculate PDF dimensions
+            const isLetter = settings.documentSize === "Letter";
+            const pdfWidth = isLetter ? 215.9 : 210; // mm
+
+            const pdf = new jsPDF({
+                orientation: "portrait",
+                unit: "mm",
+                format: isLetter ? "letter" : "a4",
+            });
+
+            const imgProps = pdf.getImageProperties(dataUrl);
+            const pdfImgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+            setDownloadProgress(80);
+
+            // Add image to PDF
+            pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfImgHeight);
+
+            setDownloadProgress(90);
+
+            // Save PDF
+            pdf.save(`${resumeData.personalInfo.fullName.replace(/\s+/g, "_")}_Resume.pdf`);
+            setDownloadProgress(100);
+
+            // Wait a bit to show completion
+            await new Promise(resolve => setTimeout(resolve, 500));
         } catch (error) {
             console.error("PDF generation failed", error);
         } finally {
             setIsDownloading(false);
+            setTimeout(() => setDownloadProgress(0), 200);
         }
     };
 
     const getPageDimensions = () => {
         if (settings.documentSize === "Letter") {
-            return { width: "216mm", minHeight: "279mm" };
+            return { width: "215.9mm", minHeight: "279.4mm" };
         }
         return { width: "210mm", minHeight: "297mm" }; // A4 default
     };
@@ -63,27 +143,105 @@ export function ResumePreview() {
         xl: "text-xl",
     }[settings.fontSize || "md"];
 
-    const getSocialIcon = (platform: string) => {
-        const Icon = getIconComponent(platform);
+    const getSocialIcon = (social: Social) => {
+        const iconName = social.icon || social.platform;
+        const Icon = getIconComponent(iconName);
         return Icon ? <Icon className="w-4 h-4" /> : <Globe className="w-4 h-4" />;
     };
 
+    const getBulletIcon = (style: string) => {
+        switch (style) {
+            case 'circle': return <Circle className="w-1.5 h-1.5" />; // Hollow circle
+            case 'square': return <Square className="w-1.5 h-1.5 fill-current" />; // Filled square
+            case 'check': return <Check className="w-3 h-3" />;
+            case 'arrow': return <ArrowRight className="w-3 h-3" />;
+            case 'chevron': return <ChevronRight className="w-3 h-3" />;
+            case 'diamond': return <Diamond className="w-2 h-2 fill-current" />;
+            case 'star': return <Star className="w-2.5 h-2.5 fill-current" />;
+            case 'minus': return <Minus className="w-3 h-3" />;
+            case 'default':
+            default: return <div className="w-1 h-1 rounded-full bg-current" />; // Disc
+        }
+    };
+
+    const renderDescription = (description: string, bulletStyle?: string) => {
+        if (!description) return null;
+
+        // If no bullet style or 'none', render as before (whitespace-pre-line)
+        if (!bulletStyle || bulletStyle === 'none') {
+            return (
+                <p className="text-[#3e3e3e] text-[12px] whitespace-pre-line leading-relaxed">
+                    {description}
+                </p>
+            );
+        }
+
+        // Split by newline
+        const items = description.split('\n').filter(item => item.trim().length > 0);
+
+        return (
+            <ul className="space-y-0.5 mt-1">
+                {items.map((item, index) => (
+                    <li key={index} className="text-[#3e3e3e] text-[12px] leading-relaxed flex items-start gap-1">
+                        <span className="shrink-0 w-3 h-[1.625em] flex items-center justify-center text-[#3e3e3e] opacity-80">
+                            {getBulletIcon(bulletStyle)}
+                        </span>
+                        <span>{item}</span>
+                    </li>
+                ))}
+            </ul>
+        );
+    };
+
     return (
-        <div className="h-full flex flex-col bg-muted">
-            <div className="p-4 border-b border-border flex justify-end gap-2 bg-card sticky top-0 z-10">
-                <Button variant="outline" onClick={() => reactToPrintFn()}>
-                    <Printer className="mr-2 h-4 w-4" />
-                    {isPrinting ? "Printing..." : "Print"}
+        <div className="h-full flex flex-col bg-muted relative">
+            {isDownloading && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                    <div className="bg-card text-card-foreground p-8 rounded-2xl shadow-2xl flex flex-col items-center gap-4 min-w-[300px] border border-border">
+                        <div className="relative">
+                            <div className="w-16 h-16 border-4 border-muted border-t-primary rounded-full animate-spin" />
+                            <Download className="w-6 h-6 text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2" />
+                        </div>
+                        <div className="text-center w-full">
+                            <h3 className="text-lg font-bold">Generating PDF</h3>
+                            <p className="text-sm text-muted-foreground mb-3">This may take a moment...</p>
+                            <div className="w-full bg-muted rounded-full h-2.5 overflow-hidden">
+                                <div
+                                    className="bg-primary h-2.5 rounded-full transition-[width] duration-300 ease-out"
+                                    style={{ width: `${downloadProgress}%` }}
+                                ></div>
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">{downloadProgress}%</p>
+                        </div>
+                    </div>
+                </div>
+            )}
+            <div className="p-4 border-b border-border flex justify-between items-center bg-card sticky top-0 z-10">
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    className="mr-auto bg-accent"
+                >
+                    <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                    <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                    <span className="sr-only">Toggle theme</span>
                 </Button>
-                <Button onClick={handleDownloadPdf} disabled={isDownloading}>
-                    <Download className="mr-2 h-4 w-4" />
-                    {isDownloading ? "Generating..." : "Download PDF"}
-                </Button>
+                <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => reactToPrintFn()}>
+                        <Printer className="mr-2 h-4 w-4" />
+                        Print
+                    </Button>
+                    <Button onClick={handleDownloadPdf} disabled={isDownloading}>
+                        <Download className="mr-2 h-4 w-4" />
+                        {isDownloading ? "Generating..." : "Download PDF"}
+                    </Button>
+                </div>
             </div>
             <div className="flex-1 overflow-y-auto p-8 flex justify-center">
                 <div
                     ref={contentRef}
-                    className={`bg-[#ffffff] origin-top scale-90 sm:scale-100 transition-transform print-content ${fontSizeClass}`}
+                    className={`bg-[#ffffff] origin-top scale-90 sm:scale-100 transition-transform print-content ${fontSizeClass} print:shadow-none print:scale-100 print:origin-top flex flex-col overflow-hidden`}
                     style={{
                         fontFamily: settings.fontFamily,
                         width,
@@ -92,7 +250,7 @@ export function ResumePreview() {
                         boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
                     }}
                 >
-                    <div className="flex flex-row h-full min-h-inherit">
+                    <div className="flex flex-row flex-1">
                         {/* Left Column - Main Content */}
                         <div className="w-[65%] p-6 pr-5 flex flex-col gap-4">
                             {/* Header */}
@@ -181,7 +339,7 @@ export function ResumePreview() {
                                     </h2>
                                     <div className="space-y-4">
                                         {resumeData.experience.map((exp) => (
-                                            <div key={exp.id} className="relative border-l-2 border-[#e5e7eb] pl-4 ml-1">
+                                            <div key={exp.id} className="relative border-l-2 border-[#e5e7eb] pl-3 ml-1">
                                                 <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-[#d1d5db]" />
                                                 <div className="flex justify-between items-baseline mb-0.5">
                                                     <h3 className="font-bold text-[#3e3e3e] text-sm">{exp.title}</h3>
@@ -192,9 +350,7 @@ export function ResumePreview() {
                                                 <div className="text-[12px] font-medium mb-1 text-[#008cff]">
                                                     {exp.company} • {exp.location}
                                                 </div>
-                                                <p className="text-[#3e3e3e] text-[12px] whitespace-pre-line leading-relaxed">
-                                                    {exp.description}
-                                                </p>
+                                                {renderDescription(exp.description, exp.bulletStyle)}
                                             </div>
                                         ))}
                                     </div>
@@ -264,7 +420,7 @@ export function ResumePreview() {
 
                         {/* Right Column - Sidebar */}
                         <div
-                            className="w-[35%] text-[#ffffff] p-6 flex flex-col gap-6 relative"
+                            className="w-[35%] text-[#ffffff] p-6 flex flex-col gap-6 relative min-h-full h-full"
                             style={{ backgroundColor: settings.themeColor }}
                         >
                             {/* Profile Photo */}
@@ -301,7 +457,7 @@ export function ResumePreview() {
                                             <div key={strength.id} className="flex gap-2">
                                                 {(() => {
                                                     const Icon = strength.icon ? getIconComponent(strength.icon) : null;
-                                                    return Icon ? <Icon className="w-4 h-4 text-[#ffffff] shrink-0 mt-0.5" /> : null;
+                                                    return Icon ? <Icon className="size-7 text-[#ffffff] shrink-0 mt-0.5 bg-[rgba(255,255,255,0.2)] p-1.5 rounded-md" /> : null;
                                                 })()}
                                                 <div>
                                                     <h3 className="font-bold text-xs mb-0.5 text-[#ffffff]">{strength.title}</h3>
@@ -323,7 +479,7 @@ export function ResumePreview() {
                                     </h2>
                                     <div className="flex flex-wrap gap-2">
                                         {resumeData.skills.map((skill) => (
-                                            <span key={skill.id} className="bg-[rgba(255,255,255,0.2)] px-2 py-1 rounded text-[12px] text-[#ffffff]">
+                                            <span key={skill.id} className="bg-[rgba(255,255,255,0.2)] px-2 py-1 rounded-md text-[12px] text-[#ffffff] font-semibold">
                                                 {skill.name}
                                             </span>
                                         ))}
@@ -346,8 +502,8 @@ export function ResumePreview() {
                                                 rel="noreferrer"
                                                 className="flex items-center gap-2 text-xs text-[rgba(255,255,255,0.9)] hover:text-[#ffffff] transition-colors group"
                                             >
-                                                <div className="bg-[rgba(255,255,255,0.2)] p-1.5 rounded group-hover:bg-[rgba(255,255,255,0.3)] transition-colors">
-                                                    {getSocialIcon(social.platform)}
+                                                <div className="bg-[rgba(255,255,255,0.2)] p-1.5 rounded-md group-hover:bg-[rgba(255,255,255,0.3)] transition-colors">
+                                                    {getSocialIcon(social)}
                                                 </div>
                                                 <div>
                                                     <div className="font-bold text-[#ffffff] text-[11px]">{social.platform}</div>

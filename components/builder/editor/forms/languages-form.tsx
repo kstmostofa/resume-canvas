@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { languageProficiencies } from "@/data/language-proficiency";
 import { useResumeStore } from "@/lib/store/useResumeStore";
 import { Language } from "@/lib/types";
-import { Plus, X } from "lucide-react";
+import { Plus, Trash2, X } from "lucide-react";
 ;
 
 export function LanguagesForm() {
@@ -54,9 +54,9 @@ export function LanguagesForm() {
                             variant="ghost"
                             size="icon"
                             onClick={() => removeLanguage(lang.id)}
-                            className="text-gray-500 hover:text-red-500 mb-0.5"
+                            className="text-gray-500 hover:text-red-500 mb-0.5 bg-accent"
                         >
-                            <X className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4" />
                         </Button>
                     </div>
                 ))}

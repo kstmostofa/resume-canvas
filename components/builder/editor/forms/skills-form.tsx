@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useResumeStore } from "@/lib/store/useResumeStore";
-import { Plus, X } from "lucide-react";
+import { Plus, Trash2, X } from "lucide-react";
 
 export function SkillsForm() {
     const { resumeData, addSkill, removeSkill, updateSkill } = useResumeStore();
@@ -22,7 +22,7 @@ export function SkillsForm() {
                     Add
                 </Button>
             </div>
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {skills.map((skill) => (
                     <div key={skill.id} className="flex items-center gap-2">
                         <Input
@@ -34,9 +34,9 @@ export function SkillsForm() {
                             variant="ghost"
                             size="icon"
                             onClick={() => removeSkill(skill.id)}
-                            className="text-gray-500 hover:text-red-500"
+                            className="text-gray-500 hover:text-red-500 bg-accent"
                         >
-                            <X className="h-4 w-4" />
+                            <Trash2 className="h-4 w-4" />
                         </Button>
                     </div>
                 ))}

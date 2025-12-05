@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { MonthYearPicker } from "@/components/ui/month-year-picker";
 import { useResumeStore } from "@/lib/store/useResumeStore";
 import { Plus, Trash2 } from "lucide-react";
 
@@ -90,18 +91,16 @@ export function EducationForm() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label>Start Date</Label>
-                                        <Input
-                                            type="month"
+                                        <MonthYearPicker
                                             value={edu.startDate}
-                                            onChange={(e) => updateEducation(edu.id, { startDate: e.target.value })}
+                                            onChange={(value) => updateEducation(edu.id, { startDate: value })}
                                         />
                                     </div>
                                     <div className="space-y-2">
                                         <Label>End Date</Label>
-                                        <Input
-                                            type="month"
+                                        <MonthYearPicker
                                             value={edu.endDate}
-                                            onChange={(e) => updateEducation(edu.id, { endDate: e.target.value })}
+                                            onChange={(value) => updateEducation(edu.id, { endDate: value })}
                                             disabled={edu.current}
                                         />
                                     </div>

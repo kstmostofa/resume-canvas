@@ -6,8 +6,10 @@ import { v4 as uuidv4 } from 'uuid';
 interface ResumeState {
     resumeData: ResumeData;
     settings: ResumeSettings;
+    _hasHydrated: boolean;
 
     // Actions
+    setHasHydrated: (state: boolean) => void;
     setPersonalInfo: (info: Partial<PersonalInfo>) => void;
 
     addExperience: (experience: Omit<Experience, 'id'>) => void;
@@ -171,7 +173,7 @@ const initialResumeData: ResumeData = {
 };
 
 const initialSettings: ResumeSettings = {
-    themeColor: "#2563eb", // Blue 600
+    themeColor: "#23405c", // Deep Blue
     fontFamily: "Inter",
     fontSize: "md",
     documentSize: "A4",
@@ -182,6 +184,7 @@ export const useResumeStore = create<ResumeState>()(
         (set) => ({
             resumeData: initialResumeData,
             settings: initialSettings,
+            _hasHydrated: false,
 
             setPersonalInfo: (info) =>
                 set((state) => ({
@@ -436,9 +439,13 @@ export const useResumeStore = create<ResumeState>()(
                     resumeData: initialResumeData,
                     settings: initialSettings,
                 }),
+            setHasHydrated: (state) => set({ _hasHydrated: state }),
         }),
         {
             name: 'resume-storage',
+            onRehydrateStorage: () => (state) => {
+                state?.setHasHydrated(true);
+            },
         }
     )
 );

@@ -1,11 +1,12 @@
 "use client";
 
-import Select from "@/components/shared/select";
+import SharedSelect from "@/components/shared/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { getIconComponent, socialIcons } from "@/lib/icons";
 import { useResumeStore } from "@/lib/store/useResumeStore";
-import { Plus, X } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 
 
 const SOCIAL_PLATFORMS = [
@@ -17,46 +18,70 @@ const SOCIAL_PLATFORMS = [
     { label: "Instagram", value: "Instagram" },
     { label: "Facebook", value: "Facebook" },
     { label: "Youtube", value: "Youtube" },
+    { label: "Dribbble", value: "Dribbble" },
+    { label: "Behance", value: "Behance" },
+    { label: "Stack Overflow", value: "Stack Overflow" },
+    { label: "Medium", value: "Medium" },
+    { label: "GitLab", value: "GitLab" },
+    { label: "Twitch", value: "Twitch" },
+    { label: "Discord", value: "Discord" },
+    { label: "Reddit", value: "Reddit" },
+    { label: "LeetCode", value: "LeetCode" },
+    { label: "Kaggle", value: "Kaggle" },
     { label: "Other", value: "Other" },
 ];
+
+const ICON_OPTIONS = socialIcons.map((iconName) => {
+    const Icon = getIconComponent(iconName);
+    return {
+        label: iconName,
+        value: iconName,
+        component: (
+            <div className="flex items-center gap-2">
+                {Icon && <Icon className="w-4 h-4" />}
+                <span>{iconName}</span>
+            </div>
+        )
+    };
+});
 
 export function SocialsForm() {
     const { resumeData, addSocial, removeSocial, updateSocial } = useResumeStore();
     const { socials } = resumeData;
 
     const handleAdd = () => {
-        addSocial({ platform: "LinkedIn", url: "", username: "" });
+        addSocial({ platform: "LinkedIn", url: "", username: "", icon: "Linkedin" });
     };
 
     return (
         <div className="bg-card border rounded-2xl p-6">
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center mb-4">
                 <h4 className="text-lg font-semibold mb-4">Social Profiles</h4>
                 <Button onClick={handleAdd} size="sm" variant="outline" className="mb-4">
                     <Plus className="h-4 w-4 mr-2" />
                     Add
                 </Button>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-8">
                 {socials.map((social) => (
-                    <div key={social.id} className="space-y-3 p-3 border rounded-md relative">
-                        <Button
-                            variant="ghost"
-                            size="icon"
-                            onClick={() => removeSocial(social.id)}
-                            className="absolute top-2 right-2 text-gray-500 hover:text-red-500 h-6 w-6"
-                        >
-                            <X className="h-4 w-4" />
-                        </Button>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div key={social.id} className="space-y-3 p-3 border rounded-md">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                             <div className="space-y-2">
                                 <Label className="text-xs">Platform</Label>
-                                <Select
+                                <SharedSelect
                                     value={social.platform}
                                     onValueChange={(value) => updateSocial(social.id, { platform: value })}
                                     options={SOCIAL_PLATFORMS}
                                     placeholder="Select Platform"
+                                />
+                            </div>
+                            <div className="space-y-2">
+                                <Label className="text-xs">Icon</Label>
+                                <SharedSelect
+                                    value={social.icon || ""}
+                                    onValueChange={(value) => updateSocial(social.id, { icon: value })}
+                                    options={ICON_OPTIONS}
+                                    placeholder="Select Icon"
                                 />
                             </div>
                             <div className="space-y-2">
@@ -76,6 +101,16 @@ export function SocialsForm() {
                                 onChange={(e) => updateSocial(social.id, { url: e.target.value })}
                                 placeholder="https://linkedin.com/in/johndoe"
                             />
+                        </div>
+                        <div className="flex justify-end pt-2">
+                            <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => removeSocial(social.id)}
+                            >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Remove
+                            </Button>
                         </div>
                     </div>
                 ))}

@@ -10,8 +10,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { DebouncedTextarea } from "@/components/ui/debounced-textarea";
+import { MonthYearPicker } from "@/components/ui/month-year-picker";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { useResumeStore } from "@/lib/store/useResumeStore";
 import { Plus, Trash2 } from "lucide-react";
+
+const BULLET_STYLES = [
+    { label: "Default (•)", value: "default" },
+    { label: "Circle (○)", value: "circle" },
+    { label: "Square (■)", value: "square" },
+    { label: "Diamond (◆)", value: "diamond" },
+    { label: "Star (★)", value: "star" },
+    { label: "Dash (-)", value: "minus" },
+    { label: "Check (✓)", value: "check" },
+    { label: "Arrow (→)", value: "arrow" },
+    { label: "Chevron (›)", value: "chevron" },
+    { label: "None", value: "none" },
+];
 
 export function ExperienceForm() {
     const { resumeData, addExperience, updateExperience, removeExperience } = useResumeStore();
@@ -92,28 +114,45 @@ export function ExperienceForm() {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label>Start Date</Label>
-                                        <Input
-                                            type="month"
+                                        <MonthYearPicker
                                             value={exp.startDate}
-                                            onChange={(e) => updateExperience(exp.id, { startDate: e.target.value })}
+                                            onChange={(value) => updateExperience(exp.id, { startDate: value })}
                                         />
                                     </div>
                                     <div className="space-y-2">
                                         <Label>End Date</Label>
-                                        <Input
-                                            type="month"
+                                        <MonthYearPicker
                                             value={exp.endDate}
-                                            onChange={(e) => updateExperience(exp.id, { endDate: e.target.value })}
+                                            onChange={(value) => updateExperience(exp.id, { endDate: value })}
                                             disabled={exp.current}
                                         />
                                     </div>
                                 </div>
 
                                 <div className="space-y-2">
-                                    <Label>Description</Label>
-                                    <Textarea
+                                    <div className="flex justify-between items-center">
+                                        <Label>Description</Label>
+                                        <div className="w-40">
+                                            <Select
+                                                value={exp.bulletStyle || "default"}
+                                                onValueChange={(value) => updateExperience(exp.id, { bulletStyle: value })}
+                                            >
+                                                <SelectTrigger className="h-8 w-full">
+                                                    <SelectValue placeholder="Bullet Style" />
+                                                </SelectTrigger>
+                                                <SelectContent>
+                                                    {BULLET_STYLES.map((style) => (
+                                                        <SelectItem key={style.value} value={style.value} className="text-xs">
+                                                            {style.label}
+                                                        </SelectItem>
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                        </div>
+                                    </div>
+                                    <DebouncedTextarea
                                         value={exp.description}
-                                        onChange={(e) => updateExperience(exp.id, { description: e.target.value })}
+                                        onDebouncedChange={(value) => updateExperience(exp.id, { description: value })}
                                         placeholder="Describe your responsibilities and achievements..."
                                         className="min-h-[100px]"
                                     />
