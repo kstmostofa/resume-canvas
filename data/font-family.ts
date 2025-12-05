@@ -1,9 +1,10 @@
-
-
 export const fontFamilies = [
+    { label: "Khand", value: "var(--font-khand), sans-serif" },
+    { label: "Inter", value: "Inter, sans-serif" },
     { label: "Arial", value: "Arial, sans-serif" },
     { label: "Helvetica", value: "Helvetica, sans-serif" },
     { label: "Times New Roman", value: "'Times New Roman', serif" },
+    { label: "Rubik", value: "var(--font-rubik), sans-serif" },
     { label: "Courier New", value: "'Courier New', monospace" },
     { label: "Georgia", value: "Georgia, serif" },
     { label: "Verdana", value: "Verdana, sans-serif" },
@@ -14,9 +15,7 @@ export const fontFamilies = [
     { label: "Lucida Console", value: "'Lucida Console', monospace" },
     { label: "Palatino Linotype", value: "'Palatino Linotype', serif" },
     { label: "Garamond", value: "Garamond, serif" },
-    { label: "Khand", value: "'Khand', sans-serif" },
     { label: "Roboto", value: "Roboto, sans-serif" },
-    { label: "Rubik", value: "Rubik, sans-serif" },
     { label: "Open Sans", value: "'Open Sans', sans-serif" },
     { label: "Lato", value: "Lato, sans-serif" },
     { label: "Montserrat", value: "Montserrat, sans-serif" },
@@ -26,5 +25,8 @@ export const fontFamilies = [
     { label: "Merriweather", value: "Merriweather, serif" },
     { label: "Ubuntu", value: "Ubuntu, sans-serif" },
     { label: "Fira Sans", value: "'Fira Sans', sans-serif" },
-    { label: "Noto Sans Devanagari", value: "'Noto Sans Devanagari', sans-serif" },
+    {
+        label: "Noto Sans Devanagari",
+        value: "'Noto Sans Devanagari', sans-serif",
+    },
 ];

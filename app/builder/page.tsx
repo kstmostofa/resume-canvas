@@ -18,7 +18,9 @@ export default function BuilderPage() {
           </div>
           <div className="text-center w-full">
             <h3 className="text-lg font-bold">Loading Resume</h3>
-            <p className="text-sm text-muted-foreground">Please wait while we prepare your workspace...</p>
+            <p className="text-sm text-muted-foreground">
+              Please wait while we prepare your workspace...
+            </p>
           </div>
         </div>
       </div>

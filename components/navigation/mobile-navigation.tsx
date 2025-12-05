@@ -58,9 +58,8 @@ export const MobileNavigation = () => {
             key={item.href}
             href={item.href}
             onClick={(e) => handleNavClick(e, item.href)}
-            className={`flex cursor-pointer flex-col items-center gap-1 rounded-lg p-2 transition-colors ${
-              pathname === item.href ? "text-primary" : "text-muted-foreground"
-            }`}
+            className={`flex cursor-pointer flex-col items-center gap-1 rounded-lg p-2 transition-colors ${pathname === item.href ? "text-primary" : "text-muted-foreground"
+              }`}
           >
             <item.icon className="h-5 w-5" />
             <span className="text-[10px] font-medium">{item.label}</span>
