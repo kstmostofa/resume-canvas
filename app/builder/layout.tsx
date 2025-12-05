@@ -1,3 +1,4 @@
+import { BackgroundAccent } from "@/components/background-accent";
 import type { Metadata } from "next";
 import { Fragment } from "react/jsx-runtime";
 
@@ -12,5 +13,10 @@ export default function BuilderLayout({
 }: Readonly<{
     children: React.ReactNode;
 }>) {
-    return <Fragment>{children}</Fragment>;
+    return (
+        <Fragment>
+            {/* <BackgroundAccent /> */}
+            {children}
+        </Fragment>
+    )
 }

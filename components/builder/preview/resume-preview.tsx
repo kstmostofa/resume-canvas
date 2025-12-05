@@ -1,0 +1,426 @@
+"use client";
+
+import { useRef, useState } from "react";
+import { useReactToPrint } from "react-to-print";
+import {
+    Download,
+    Printer,
+    Phone,
+    Mail,
+    MapPin,
+    Globe,
+    ExternalLink,
+    User,
+    Linkedin,
+    Twitter,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { useResumeStore } from "@/lib/store/useResumeStore";
+import { getIconComponent } from "@/lib/icons";
+import Image from "next/image";
+import { darkenColor } from "@/lib/utils";
+
+export function ResumePreview() {
+    const { resumeData, settings } = useResumeStore();
+    const contentRef = useRef<HTMLDivElement>(null);
+    const [isDownloading, setIsDownloading] = useState(false);
+    const [isPrinting, setIsPrinting] = useState(false);
+    const reactToPrintFn = useReactToPrint({ contentRef });
+
+    const handleDownloadPdf = async () => {
+        if (!contentRef.current) return;
+        setIsDownloading(true);
+        try {
+            const html2pdf = (await import("html2pdf.js")).default;
+            const opt = {
+                margin: 0,
+                filename: `${resumeData.personalInfo.fullName.replace(/\s+/g, "_")}_Resume.pdf`,
+                image: { type: "jpeg" as const, quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: "mm", format: settings.documentSize === "Letter" ? "letter" : "a4", orientation: "portrait" as const }
+            };
+            await html2pdf().set(opt).from(contentRef.current).save();
+        } catch (error) {
+            console.error("PDF generation failed", error);
+        } finally {
+            setIsDownloading(false);
+        }
+    };
+
+    const getPageDimensions = () => {
+        if (settings.documentSize === "Letter") {
+            return { width: "216mm", minHeight: "279mm" };
+        }
+        return { width: "210mm", minHeight: "297mm" }; // A4 default
+    };
+
+    const { width, minHeight } = getPageDimensions();
+
+    const fontSizeClass = {
+        sm: "text-sm",
+        md: "text-base",
+        lg: "text-lg",
+        xl: "text-xl",
+    }[settings.fontSize || "md"];
+
+    const getSocialIcon = (platform: string) => {
+        const Icon = getIconComponent(platform);
+        return Icon ? <Icon className="w-4 h-4" /> : <Globe className="w-4 h-4" />;
+    };
+
+    return (
+        <div className="h-full flex flex-col bg-muted">
+            <div className="p-4 border-b border-border flex justify-end gap-2 bg-card sticky top-0 z-10">
+                <Button variant="outline" onClick={() => reactToPrintFn()}>
+                    <Printer className="mr-2 h-4 w-4" />
+                    {isPrinting ? "Printing..." : "Print"}
+                </Button>
+                <Button onClick={handleDownloadPdf} disabled={isDownloading}>
+                    <Download className="mr-2 h-4 w-4" />
+                    {isDownloading ? "Generating..." : "Download PDF"}
+                </Button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-8 flex justify-center">
+                <div
+                    ref={contentRef}
+                    className={`bg-[#ffffff] origin-top scale-90 sm:scale-100 transition-transform print-content ${fontSizeClass}`}
+                    style={{
+                        fontFamily: settings.fontFamily,
+                        width,
+                        minHeight,
+                        color: "#333",
+                        boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                    }}
+                >
+                    <div className="flex flex-row h-full min-h-inherit">
+                        {/* Left Column - Main Content */}
+                        <div className="w-[65%] p-6 pr-5 flex flex-col gap-4">
+                            {/* Header */}
+                            <header className="" style={{ borderColor: settings.themeColor }}>
+                                <h1
+                                    className="text-3xl font-bold uppercase tracking-wider"
+                                    style={{ color: "#3e3e3e" }}
+                                >
+                                    {resumeData.personalInfo.fullName}
+                                </h1>
+                                <p
+                                    className="mb-2"
+                                    // style={{ color: settings.themeColor }}
+                                    style={{
+                                        color: "#008cff",
+                                        fontSize: "16px",
+                                        fontWeight: "400",
+                                    }}
+                                >
+                                    {resumeData.personalInfo.title}
+                                </p>
+
+                                <div className="flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-[#3e3e3e]">
+                                    {resumeData.personalInfo.phone && (
+                                        <div className="flex items-center gap-1">
+                                            <Phone className="w-3 h-3" />
+                                            <span>{resumeData.personalInfo.phone}</span>
+                                        </div>
+                                    )}
+                                    {resumeData.personalInfo.email && (
+                                        <div className="flex items-center gap-1">
+                                            <Mail className="w-3 h-3" />
+                                            <span>{resumeData.personalInfo.email}</span>
+                                        </div>
+                                    )}
+                                    {resumeData.personalInfo.location && (
+                                        <div className="flex items-center gap-1">
+                                            <MapPin className="w-3 h-3" />
+                                            <span>{resumeData.personalInfo.location}</span>
+                                        </div>
+                                    )}
+                                    {resumeData.personalInfo.website && (
+                                        <div className="flex items-center gap-1">
+                                            <Globe className="w-3 h-3" />
+                                            <a href={resumeData.personalInfo.website} target="_blank" rel="noreferrer" className="hover:underline">
+                                                {resumeData.personalInfo.website}
+                                            </a>
+                                        </div>
+                                    )}
+                                    {resumeData.personalInfo.linkedin && (
+                                        <div className="flex items-center gap-1">
+                                            <Linkedin className="w-3 h-3" />
+                                            <a href={resumeData.personalInfo.linkedin} target="_blank" rel="noreferrer" className="hover:underline">
+                                                {resumeData.personalInfo.linkedin}
+                                            </a>
+                                        </div>
+                                    )}
+                                    {resumeData.personalInfo.twitter && (
+                                        <div className="flex items-center gap-1">
+                                            <Twitter className="w-3 h-3" />
+                                            <a href={resumeData.personalInfo.twitter} target="_blank" rel="noreferrer" className="hover:underline">
+                                                {resumeData.personalInfo.twitter}
+                                            </a>
+                                        </div>
+                                    )}
+                                </div>
+                            </header>
+
+                            {/* Summary */}
+                            {resumeData.personalInfo.summary && (
+                                <section>
+                                    <h2 className="text-[16px] font-bold uppercase tracking-wider mb-2 text-[#3e3e3e] border-b border-[#e5e7eb]">
+                                        Summary
+                                    </h2>
+                                    <p className="text-[#3e3e3e] leading-relaxed text-[12px] text-justify">
+                                        {resumeData.personalInfo.summary}
+                                    </p>
+                                </section>
+                            )}
+
+                            {/* Experience */}
+                            {resumeData.experience.length > 0 && (
+                                <section>
+                                    <h2 className="text-[16px] font-bold uppercase tracking-wider mb-2 text-[#3e3e3e] border-b border-[#e5e7eb]">
+                                        Work Experience
+                                    </h2>
+                                    <div className="space-y-4">
+                                        {resumeData.experience.map((exp) => (
+                                            <div key={exp.id} className="relative border-l-2 border-[#e5e7eb] pl-4 ml-1">
+                                                <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-[#d1d5db]" />
+                                                <div className="flex justify-between items-baseline mb-0.5">
+                                                    <h3 className="font-bold text-[#3e3e3e] text-sm">{exp.title}</h3>
+                                                    <span className="text-[10px] font-medium text-[#3e3e3e] whitespace-nowrap ml-2">
+                                                        {exp.startDate} / {exp.current ? "Present" : exp.endDate}
+                                                    </span>
+                                                </div>
+                                                <div className="text-[12px] font-medium mb-1 text-[#008cff]">
+                                                    {exp.company} • {exp.location}
+                                                </div>
+                                                <p className="text-[#3e3e3e] text-[12px] whitespace-pre-line leading-relaxed">
+                                                    {exp.description}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Education */}
+                            {resumeData.education.length > 0 && (
+                                <section>
+                                    <h2 className="text-[16px] font-bold uppercase tracking-wider mb-2 text-[#3e3e3e] border-b border-[#e5e7eb]">
+                                        Education
+                                    </h2>
+                                    <div className="space-y-3">
+                                        {resumeData.education.map((edu) => (
+                                            <div key={edu.id} className="border-b border-[#f3f4f6] pb-2 last:border-0 last:pb-0">
+                                                <div className="flex justify-between items-baseline mb-0.5">
+                                                    <h3 className="font-bold text-[#3e3e3e] text-sm">{edu.degree}</h3>
+                                                    <span className="text-[10px] font-medium text-[#3e3e3e] whitespace-nowrap ml-2">
+                                                        {edu.startDate} / {edu.current ? "Present" : edu.endDate}
+                                                    </span>
+                                                </div>
+                                                <div className="text-[12px] font-medium text-[#008cff]">
+                                                    {edu.school}, {edu.location}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Projects */}
+                            {resumeData.projects.length > 0 && (
+                                <section>
+                                    <h2 className="text-[16px] font-bold uppercase tracking-wider mb-2 text-[#3e3e3e] border-b border-[#e5e7eb]">
+                                        Projects
+                                    </h2>
+                                    <div className="space-y-3">
+                                        {resumeData.projects.map((project) => (
+                                            <div key={project.id}>
+                                                <div className="flex justify-between items-baseline mb-0.5">
+                                                    <h3 className="font-bold text-[#3e3e3e] text-sm flex items-center gap-2">
+                                                        {project.name}
+                                                        {project.link && (
+                                                            <a href={project.link} target="_blank" rel="noreferrer" className="text-[#e5e7eb] hover:text-[#4b5563]">
+                                                                <ExternalLink className="w-3 h-3" />
+                                                            </a>
+                                                        )}
+                                                    </h3>
+                                                    <span className="text-[10px] font-medium text-[#3e3e3e] whitespace-nowrap ml-2">
+                                                        {project.date}
+                                                    </span>
+                                                </div>
+                                                {project.link && (
+                                                    <a href={project.link} target="_blank" rel="noreferrer" className="text-[12px] block mb-1 hover:underline text-[#008cff] line-clamp-1">
+                                                        {project.link}
+                                                    </a>
+                                                )}
+                                                <p className="text-[#3e3e3e] text-[12px] whitespace-pre-line leading-relaxed">
+                                                    {project.description}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+                        </div>
+
+                        {/* Right Column - Sidebar */}
+                        <div
+                            className="w-[35%] text-[#ffffff] p-6 flex flex-col gap-6 relative"
+                            style={{ backgroundColor: settings.themeColor }}
+                        >
+                            {/* Profile Photo */}
+                            <div className="absolute top-0 left-0 h-4 w-full" style={{
+                                background: darkenColor(settings.themeColor, 0.7)
+                            }} />
+                            <div className="flex justify-center">
+                                <div
+                                    className="w-24 h-24 rounded-full mt-2 bg-[#e5e7eb] border-3 border-[#ffffff] overflow-hidden flex items-center justify-center"
+                                    style={{ boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)" }}
+                                >
+                                    {resumeData.personalInfo.photoUrl ? (
+                                        <Image
+                                            src={resumeData.personalInfo.photoUrl}
+                                            alt={resumeData.personalInfo.fullName}
+                                            className="w-full h-full object-cover"
+                                            width={112}
+                                            height={112}
+                                        />
+                                    ) : (
+                                        <User className="w-24 h-24 text-[#9ca3af]" />
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Strengths */}
+                            {resumeData.strengths.length > 0 && (
+                                <section>
+                                    <h2 className="text-[16px] font-bold uppercase tracking-wider mb-3 border-b border-[rgba(255,255,255,0.2)] pb-1 text-[rgba(255,255,255,0.9)]">
+                                        Strengths
+                                    </h2>
+                                    <div className="space-y-3">
+                                        {resumeData.strengths.map((strength) => (
+                                            <div key={strength.id} className="flex gap-2">
+                                                {(() => {
+                                                    const Icon = strength.icon ? getIconComponent(strength.icon) : null;
+                                                    return Icon ? <Icon className="w-4 h-4 text-[#ffffff] shrink-0 mt-0.5" /> : null;
+                                                })()}
+                                                <div>
+                                                    <h3 className="font-bold text-xs mb-0.5 text-[#ffffff]">{strength.title}</h3>
+                                                    <p className="text-[rgba(255,255,255,0.8)] text-[10px] leading-relaxed">
+                                                        {strength.description}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Skills */}
+                            {resumeData.skills.length > 0 && (
+                                <section>
+                                    <h2 className="text-[16px] font-bold uppercase tracking-wider mb-3 border-b border-[rgba(255,255,255,0.2)] pb-1 text-[rgba(255,255,255,0.9)]">
+                                        Skills
+                                    </h2>
+                                    <div className="flex flex-wrap gap-2">
+                                        {resumeData.skills.map((skill) => (
+                                            <span key={skill.id} className="bg-[rgba(255,255,255,0.2)] px-2 py-1 rounded text-[12px] text-[#ffffff]">
+                                                {skill.name}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Find Me Online */}
+                            {resumeData.socials.length > 0 && (
+                                <section>
+                                    <h2 className="text-[16px] font-bold uppercase tracking-wider mb-3 border-b border-[rgba(255,255,255,0.2)] pb-1 text-[rgba(255,255,255,0.9)]">
+                                        Find Me Online
+                                    </h2>
+                                    <div className="space-y-2">
+                                        {resumeData.socials.map((social) => (
+                                            <a
+                                                key={social.id}
+                                                href={social.url}
+                                                target="_blank"
+                                                rel="noreferrer"
+                                                className="flex items-center gap-2 text-xs text-[rgba(255,255,255,0.9)] hover:text-[#ffffff] transition-colors group"
+                                            >
+                                                <div className="bg-[rgba(255,255,255,0.2)] p-1.5 rounded group-hover:bg-[rgba(255,255,255,0.3)] transition-colors">
+                                                    {getSocialIcon(social.platform)}
+                                                </div>
+                                                <div>
+                                                    <div className="font-bold text-[#ffffff] text-[11px]">{social.platform}</div>
+                                                    <div className="text-[10px] truncate max-w-[120px] opacity-80">{social.username || "Link"}</div>
+                                                </div>
+                                            </a>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Languages */}
+                            {resumeData.languages.length > 0 && (
+                                <section>
+                                    <h2 className="text-[16px] font-bold uppercase tracking-wider mb-3 border-b border-[rgba(255,255,255,0.2)] pb-1 text-[rgba(255,255,255,0.9)]">
+                                        Languages
+                                    </h2>
+                                    <div className="space-y-2">
+                                        {resumeData.languages.map((lang) => (
+                                            <div key={lang.id} className="flex items-center justify-between text-xs">
+                                                <div className="flex flex-col">
+                                                    <span className="font-medium text-[#ffffff]">{lang.name}</span>
+                                                    <span className="text-[10px] text-[rgba(255,255,255,0.7)]">{lang.proficiency}</span>
+                                                </div>
+                                                <div className="flex gap-1">
+                                                    {[1, 2, 3, 4, 5].map((i) => {
+                                                        const level = lang.proficiency.includes("Native") ? 5 :
+                                                            lang.proficiency.includes("Fluent") ? 4 :
+                                                                lang.proficiency.includes("Proficient") ? 3 :
+                                                                    lang.proficiency.includes("Intermediate") ? 2 : 1;
+                                                        return (
+                                                            <div
+                                                                key={i}
+                                                                className={`w-1.25 h-4 rounded-sm ${i <= level ? "bg-[#ffffff]" : "bg-[rgba(255,255,255,0.2)]"}`}
+                                                            />
+                                                        );
+                                                    })}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+
+                            {/* Certifications */}
+                            {resumeData.certifications.length > 0 && (
+                                <section>
+                                    <h2 className="text-[16px] font-bold uppercase tracking-wider mb-3 border-b border-[rgba(255,255,255,0.2)] pb-1 text-[rgba(255,255,255,0.9)]">
+                                        Certification
+                                    </h2>
+                                    <div className="space-y-3">
+                                        {resumeData.certifications.map((cert) => (
+                                            <div key={cert.id}>
+                                                <h3 className="font-bold text-xs mb-0.5 text-[#ffffff]">{cert.name}</h3>
+                                                <p className="text-[rgba(255,255,255,0.8)] text-[12px]">
+                                                    {cert.issuer} <a href={cert.link} target="_blank" rel="noreferrer" className="underline hover:text-[#ffffff]">
+                                                        <ExternalLink className="w-3 h-3 inline-block ml-1" />
+                                                    </a>
+                                                </p>
+                                                {cert.description && (
+                                                    <p className="text-[rgba(255,255,255,0.7)] text-[10px] mt-1 leading-relaxed">
+                                                        {cert.description}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
