@@ -16,52 +16,56 @@ export function ResumeEditor() {
   // const { resumeData } = useResumeStore();
 
   return (
-    <div className="h-full overflow-y-auto p-6 bg-muted border-r border-border scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
-      <Link href={"/"} className="text-3xl font-bold mb-6 flex">
-        <div>
-          <span className="text-primary">Resume</span> Canvas
+    <div className="h-full flex flex-col bg-muted border-r border-border">
+      <div className="p-4 shrink-0 bg-card border-b border-border z-10 flex items-center justify-between h-[69px]">
+        <Link href={"/"} className="text-3xl font-bold flex items-center pl-4">
+          <div>
+            <span className="text-primary">Resume</span> Canvas
+          </div>
+        </Link>
+      </div>
+      <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-6 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-700">
+        <div className="space-y-8">
+          <section>
+            <SettingsForm />
+          </section>
+
+          <section>
+            <PersonalInfoForm />
+          </section>
+
+          <section>
+            <ExperienceForm />
+          </section>
+
+          <section>
+            <EducationForm />
+          </section>
+
+          <section>
+            <SkillsForm />
+          </section>
+
+          <section>
+            <ProjectsForm />
+          </section>
+
+          <section>
+            <LanguagesForm />
+          </section>
+
+          <section>
+            <CertificationsForm />
+          </section>
+
+          <section>
+            <StrengthsForm />
+          </section>
+
+          <section>
+            <SocialsForm />
+          </section>
         </div>
-      </Link>
-      <div className="space-y-8 pb-20">
-        <section>
-          <SettingsForm />
-        </section>
-
-        <section>
-          <PersonalInfoForm />
-        </section>
-
-        <section>
-          <ExperienceForm />
-        </section>
-
-        <section>
-          <EducationForm />
-        </section>
-
-        <section>
-          <SkillsForm />
-        </section>
-
-        <section>
-          <ProjectsForm />
-        </section>
-
-        <section>
-          <LanguagesForm />
-        </section>
-
-        <section>
-          <CertificationsForm />
-        </section>
-
-        <section>
-          <StrengthsForm />
-        </section>
-
-        <section>
-          <SocialsForm />
-        </section>
       </div>
     </div>
   );
