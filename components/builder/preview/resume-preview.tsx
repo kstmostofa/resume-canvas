@@ -31,6 +31,16 @@ import { getIconComponent } from "@/lib/icons";
 import Image from "next/image";
 import { darkenColor } from "@/lib/utils";
 import { Social } from "@/lib/types";
+import { RenderResume } from "./render-resume";
+import dynamic from "next/dynamic";
+
+const PDFViewer = dynamic(
+    () => import("@react-pdf/renderer").then((mod) => mod.PDFViewer),
+    {
+        ssr: false,
+        loading: () => <p>Loading PDF Viewer...</p>,
+    },
+);
 
 export function ResumePreview() {
     const { resumeData, settings } = useResumeStore();
@@ -38,6 +48,7 @@ export function ResumePreview() {
     const contentRef = useRef<HTMLDivElement>(null);
     const [isDownloading, setIsDownloading] = useState(false);
     const [downloadProgress, setDownloadProgress] = useState(0);
+    const [showPdf, setShowPdf] = useState(true);
 
     const reactToPrintFn = useReactToPrint({
         contentRef,
@@ -61,64 +72,29 @@ export function ResumePreview() {
     });
 
     const handleDownloadPdf = async () => {
-        if (!contentRef.current) return;
         setIsDownloading(true);
         setDownloadProgress(0);
 
-        // Give React time to render the loading state
-        await new Promise((resolve) => setTimeout(resolve, 100));
-
         try {
             setDownloadProgress(10);
-            const { toJpeg } = await import("html-to-image");
-            const { jsPDF } = await import("jspdf");
+            // Dynamically import pdf function to avoid SSR issues
+            const { pdf } = await import("@react-pdf/renderer");
 
-            // Wait for fonts to load
-            await document.fonts.ready;
             setDownloadProgress(30);
-
-            // Get the element dimensions
-            const element = contentRef.current;
-
-            // Generate high-quality PNG
-            const dataUrl = await toJpeg(element, {
-                quality: 1.0,
-                pixelRatio: 3, // Increased resolution
-                backgroundColor: "#ffffff",
-                style: {
-                    transform: "scale(1)",
-                    boxShadow: "none",
-                    margin: "0",
-                },
-            });
-            setDownloadProgress(60);
-
-            // Calculate PDF dimensions
-            const isLetter = settings.documentSize === "Letter";
-            const pdfWidth = isLetter ? 215.9 : 210; // mm
-
-            const pdf = new jsPDF({
-                orientation: "portrait",
-                unit: "mm",
-                format: isLetter ? "letter" : "a4",
-            });
-
-            const imgProps = pdf.getImageProperties(dataUrl);
-            const pdfImgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+            const blob = await pdf(
+                <RenderResume resumeData={resumeData} settings={settings} />
+            ).toBlob();
 
             setDownloadProgress(80);
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `${resumeData.personalInfo.fullName.replace(/\s+/g, "_")}_Resume.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
 
-            // Add image to PDF
-            pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfImgHeight);
-
-            setDownloadProgress(90);
-
-            // Save PDF
-            pdf.save(
-                `${resumeData.personalInfo.fullName.replace(/\s+/g, "_")}_Resume.pdf`,
-            );
             setDownloadProgress(100);
-
             // Wait a bit to show completion
             await new Promise((resolve) => setTimeout(resolve, 500));
         } catch (error) {
@@ -237,16 +213,25 @@ export function ResumePreview() {
                 </div>
             )}
             <div className="p-4 border-b border-border flex justify-between items-center bg-card sticky top-0 z-10">
-                <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-                    className="mr-auto bg-accent"
-                >
-                    <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                    <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                    <span className="sr-only">Toggle theme</span>
-                </Button>
+                <div className="flex items-center gap-2">
+                    <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                        className="bg-accent"
+                    >
+                        <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+                        <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+                        <span className="sr-only">Toggle theme</span>
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowPdf(!showPdf)}
+                    >
+                        {showPdf ? "Show HTML" : "Show PDF"}
+                    </Button>
+                </div>
                 <div className="flex gap-2">
                     <Button
                         variant="outline"
@@ -267,468 +252,476 @@ export function ResumePreview() {
                 </div>
             </div>
             <div className="flex-1 overflow-y-auto p-8 flex justify-center">
-                <div
-                    ref={contentRef}
-                    className={`bg-[#ffffff] origin-top scale-90 sm:scale-100 transition-transform print-content ${fontSizeClass} print:shadow-none print:scale-100 print:origin-top flex flex-col overflow-hidden`}
-                    style={{
-                        fontFamily: settings.fontFamily,
-                        width,
-                        minHeight,
-                        color: "#333",
-                        boxShadow:
-                            "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-                    }}
-                >
-                    <div className="flex flex-row flex-1">
-                        {/* Left Column - Main Content */}
-                        <div className="w-[65%] p-6 pr-5 flex flex-col gap-4">
-                            {/* Header */}
-                            <header className="" style={{ borderColor: settings.themeColor }}>
-                                <h1
-                                    className="text-[28px] uppercase tracking-wider"
-                                    style={{
-                                        color: "#3e3e3e",
-                                        fontWeight: "600",
-                                    }}
-                                >
-                                    {resumeData.personalInfo.fullName}
-                                </h1>
-                                <p
-                                    className="mb-2"
-                                    // style={{ color: settings.themeColor }}
-                                    style={{
-                                        color: "#008cff",
-                                        fontSize: "16px",
-                                        fontWeight: "500",
-                                    }}
-                                >
-                                    {resumeData.personalInfo.title}
-                                </p>
-
-                                <div className="flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-[#3e3e3e]">
-                                    {resumeData.personalInfo.phone && (
-                                        <div className="flex items-center gap-1">
-                                            <Phone className="w-3 h-3" />
-                                            <span>{resumeData.personalInfo.phone}</span>
-                                        </div>
-                                    )}
-                                    {resumeData.personalInfo.email && (
-                                        <div className="flex items-center gap-1">
-                                            <Mail className="w-3 h-3" />
-                                            <span>{resumeData.personalInfo.email}</span>
-                                        </div>
-                                    )}
-                                    {resumeData.personalInfo.location && (
-                                        <div className="flex items-center gap-1">
-                                            <MapPin className="w-3 h-3" />
-                                            <span>{resumeData.personalInfo.location}</span>
-                                        </div>
-                                    )}
-                                    {resumeData.personalInfo.website && (
-                                        <div className="flex items-center gap-1">
-                                            <Globe className="w-3 h-3" />
-                                            <a
-                                                href={resumeData.personalInfo.website}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                className="hover:underline"
-                                            >
-                                                {resumeData.personalInfo.website}
-                                            </a>
-                                        </div>
-                                    )}
-                                    {resumeData.personalInfo.linkedin && (
-                                        <div className="flex items-center gap-1">
-                                            <Linkedin className="w-3 h-3" />
-                                            <a
-                                                href={resumeData.personalInfo.linkedin}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                className="hover:underline"
-                                            >
-                                                {resumeData.personalInfo.linkedin}
-                                            </a>
-                                        </div>
-                                    )}
-                                    {resumeData.personalInfo.twitter && (
-                                        <div className="flex items-center gap-1">
-                                            <Twitter className="w-3 h-3" />
-                                            <a
-                                                href={resumeData.personalInfo.twitter}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                className="hover:underline"
-                                            >
-                                                {resumeData.personalInfo.twitter}
-                                            </a>
-                                        </div>
-                                    )}
-                                </div>
-                            </header>
-
-                            {/* Summary */}
-                            {resumeData.personalInfo.summary && (
-                                <section>
-                                    <h2
-                                        className="text-[16px] uppercase tracking-wider mb-2 text-[#3e3e3e] border-b border-[#e5e7eb]"
-                                        style={{ fontWeight: "500" }}
+                {showPdf ? (
+                    <div className="h-full w-full shadow-2xl">
+                        <PDFViewer className="w-full h-full" showToolbar={false}>
+                            <RenderResume resumeData={resumeData} settings={settings} />
+                        </PDFViewer>
+                    </div>
+                ) : (
+                    <div
+                        ref={contentRef}
+                        className={`bg-[#ffffff] origin-top scale-90 sm:scale-100 transition-transform print-content ${fontSizeClass} print:shadow-none print:scale-100 print:origin-top flex flex-col overflow-hidden`}
+                        style={{
+                            fontFamily: settings.fontFamily,
+                            width,
+                            minHeight,
+                            color: "#333",
+                            boxShadow:
+                                "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
+                        }}
+                    >
+                        <div className="flex flex-row flex-1">
+                            {/* Left Column - Main Content */}
+                            <div className="w-[65%] p-6 pr-5 flex flex-col gap-4">
+                                {/* Header */}
+                                <header className="" style={{ borderColor: settings.themeColor }}>
+                                    <h1
+                                        className="text-[28px] uppercase tracking-wider"
+                                        style={{
+                                            color: "#3e3e3e",
+                                            fontWeight: "600",
+                                        }}
                                     >
-                                        Summary
-                                    </h2>
-                                    <p className="text-[#3e3e3e] leading-relaxed text-[12px] text-justify">
-                                        {resumeData.personalInfo.summary}
+                                        {resumeData.personalInfo.fullName}
+                                    </h1>
+                                    <p
+                                        className="mb-2"
+                                        // style={{ color: settings.themeColor }}
+                                        style={{
+                                            color: "#008cff",
+                                            fontSize: "16px",
+                                            fontWeight: "500",
+                                        }}
+                                    >
+                                        {resumeData.personalInfo.title}
                                     </p>
-                                </section>
-                            )}
 
-                            {/* Experience */}
-                            {resumeData.experience.length > 0 && (
-                                <section>
-                                    <h2
-                                        className="text-[16px] uppercase tracking-wider mb-2 text-[#3e3e3e] border-b border-[#e5e7eb]"
-                                        style={{ fontWeight: "500" }}
-                                    >
-                                        Work Experience
-                                    </h2>
-                                    <div className="space-y-4">
-                                        {resumeData.experience.map((exp) => (
-                                            <div
-                                                key={exp.id}
-                                                className="relative border-l-2 border-[#e5e7eb] pl-3 ml-1"
-                                            >
-                                                <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-[#d1d5db]" />
-                                                <div className="flex justify-between items-baseline mb-0.5">
-                                                    <h3
-                                                        className="text-[#3e3e3e] text-sm"
-                                                        style={{ fontWeight: "500" }}
-                                                    >
-                                                        {exp.title}
-                                                    </h3>
-                                                    <span className="text-[10px] font-medium text-[#3e3e3e] whitespace-nowrap ml-2">
-                                                        {exp.startDate} /{" "}
-                                                        {exp.current ? "Present" : exp.endDate}
-                                                    </span>
-                                                </div>
-                                                <div className="text-[12px] font-medium mb-1 text-[#008cff]">
-                                                    {exp.company} • {exp.location}
-                                                </div>
-                                                {renderDescription(exp.description, exp.bulletStyle)}
+                                    <div className="flex flex-wrap gap-x-3 gap-y-1 text-[12px] text-[#3e3e3e]">
+                                        {resumeData.personalInfo.phone && (
+                                            <div className="flex items-center gap-1">
+                                                <Phone className="w-3 h-3" />
+                                                <span>{resumeData.personalInfo.phone}</span>
                                             </div>
-                                        ))}
-                                    </div>
-                                </section>
-                            )}
-
-                            {/* Education */}
-                            {resumeData.education.length > 0 && (
-                                <section>
-                                    <h2
-                                        className="text-[16px] uppercase tracking-wider mb-2 text-[#3e3e3e] border-b border-[#e5e7eb]"
-                                        style={{ fontWeight: "500" }}
-                                    >
-                                        Education
-                                    </h2>
-                                    <div className="space-y-3">
-                                        {resumeData.education.map((edu) => (
-                                            <div
-                                                key={edu.id}
-                                                className="border-b border-[#f3f4f6] pb-2 last:border-0 last:pb-0"
-                                            >
-                                                <div className="flex justify-between items-baseline mb-0.5">
-                                                    <h3
-                                                        className="text-[#3e3e3e] text-[14px]"
-                                                        style={{ fontWeight: "500" }}
-                                                    >
-                                                        {edu.degree}
-                                                    </h3>
-                                                    <span className="text-[10px] font-medium text-[#3e3e3e] whitespace-nowrap ml-2">
-                                                        {edu.startDate} /{" "}
-                                                        {edu.current ? "Present" : edu.endDate}
-                                                    </span>
-                                                </div>
-                                                <div className="text-[12px] font-medium text-[#008cff]">
-                                                    {edu.school}, {edu.location}
-                                                </div>
+                                        )}
+                                        {resumeData.personalInfo.email && (
+                                            <div className="flex items-center gap-1">
+                                                <Mail className="w-3 h-3" />
+                                                <span>{resumeData.personalInfo.email}</span>
                                             </div>
-                                        ))}
-                                    </div>
-                                </section>
-                            )}
-
-                            {/* Projects */}
-                            {resumeData.projects.length > 0 && (
-                                <section>
-                                    <h2
-                                        className="text-[16px] uppercase tracking-wider mb-2 text-[#3e3e3e] border-b border-[#e5e7eb]"
-                                        style={{ fontWeight: "500" }}
-                                    >
-                                        Projects
-                                    </h2>
-                                    <div className="space-y-3">
-                                        {resumeData.projects.map((project) => (
-                                            <div key={project.id}>
-                                                <div className="flex justify-between items-baseline mb-0.5">
-                                                    <h3
-                                                        className="text-[#3e3e3e] text-sm flex items-center gap-2"
-                                                        style={{ fontWeight: "500" }}
-                                                    >
-                                                        {project.name}
-                                                        {project.link && (
-                                                            <a
-                                                                href={project.link}
-                                                                target="_blank"
-                                                                rel="noreferrer"
-                                                                className="text-[#e5e7eb] hover:text-[#4b5563]"
-                                                            >
-                                                                <ExternalLink className="w-3 h-3" />
-                                                            </a>
-                                                        )}
-                                                    </h3>
-                                                    <span className="text-[10px] font-medium text-[#3e3e3e] whitespace-nowrap ml-2">
-                                                        {project.date}
-                                                    </span>
-                                                </div>
-                                                {project.link && (
-                                                    <a
-                                                        href={project.link}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        className="text-[12px] block mb-1 hover:underline text-[#008cff] line-clamp-1"
-                                                    >
-                                                        {project.link}
-                                                    </a>
-                                                )}
-                                                <p className="text-[#3e3e3e] text-[12px] whitespace-pre-line leading-relaxed">
-                                                    {project.description}
-                                                </p>
+                                        )}
+                                        {resumeData.personalInfo.location && (
+                                            <div className="flex items-center gap-1">
+                                                <MapPin className="w-3 h-3" />
+                                                <span>{resumeData.personalInfo.location}</span>
                                             </div>
-                                        ))}
+                                        )}
+                                        {resumeData.personalInfo.website && (
+                                            <div className="flex items-center gap-1">
+                                                <Globe className="w-3 h-3" />
+                                                <a
+                                                    href={resumeData.personalInfo.website}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="hover:underline"
+                                                >
+                                                    {resumeData.personalInfo.website}
+                                                </a>
+                                            </div>
+                                        )}
+                                        {resumeData.personalInfo.linkedin && (
+                                            <div className="flex items-center gap-1">
+                                                <Linkedin className="w-3 h-3" />
+                                                <a
+                                                    href={resumeData.personalInfo.linkedin}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="hover:underline"
+                                                >
+                                                    {resumeData.personalInfo.linkedin}
+                                                </a>
+                                            </div>
+                                        )}
+                                        {resumeData.personalInfo.twitter && (
+                                            <div className="flex items-center gap-1">
+                                                <Twitter className="w-3 h-3" />
+                                                <a
+                                                    href={resumeData.personalInfo.twitter}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="hover:underline"
+                                                >
+                                                    {resumeData.personalInfo.twitter}
+                                                </a>
+                                            </div>
+                                        )}
                                     </div>
-                                </section>
-                            )}
-                        </div>
+                                </header>
 
-                        {/* Right Column - Sidebar */}
-                        <div
-                            className="w-[35%] text-[#ffffff] p-6 flex flex-col gap-6 relative min-h-full h-full"
-                            style={{ backgroundColor: settings.themeColor }}
-                        >
-                            {/* Profile Photo */}
-                            <div
-                                className="absolute top-0 left-0 h-4 w-full"
-                                style={{
-                                    background: darkenColor(settings.themeColor, 0.7),
-                                }}
-                            />
-                            <div className="flex justify-center">
-                                <div
-                                    className="w-24 h-24 rounded-full mt-2 bg-[#e5e7eb] border-3 border-[#ffffff] overflow-hidden flex items-center justify-center"
-                                    style={{
-                                        boxShadow:
-                                            "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
-                                    }}
-                                >
-                                    {resumeData.personalInfo.photoUrl ? (
-                                        <Image
-                                            src={resumeData.personalInfo.photoUrl}
-                                            alt={resumeData.personalInfo.fullName}
-                                            className="w-full h-full object-cover"
-                                            width={112}
-                                            height={112}
-                                        />
-                                    ) : (
-                                        <User className="w-24 h-24 text-[#9ca3af]" />
-                                    )}
-                                </div>
+                                {/* Summary */}
+                                {resumeData.personalInfo.summary && (
+                                    <section>
+                                        <h2
+                                            className="text-[16px] uppercase tracking-wider mb-2 text-[#3e3e3e] border-b border-[#e5e7eb]"
+                                            style={{ fontWeight: "500" }}
+                                        >
+                                            Summary
+                                        </h2>
+                                        <p className="text-[#3e3e3e] leading-relaxed text-[12px] text-justify">
+                                            {resumeData.personalInfo.summary}
+                                        </p>
+                                    </section>
+                                )}
+
+                                {/* Experience */}
+                                {resumeData.experience.length > 0 && (
+                                    <section>
+                                        <h2
+                                            className="text-[16px] uppercase tracking-wider mb-2 text-[#3e3e3e] border-b border-[#e5e7eb]"
+                                            style={{ fontWeight: "500" }}
+                                        >
+                                            Work Experience
+                                        </h2>
+                                        <div className="space-y-4">
+                                            {resumeData.experience.map((exp) => (
+                                                <div
+                                                    key={exp.id}
+                                                    className="relative border-l-2 border-[#e5e7eb] pl-3 ml-1"
+                                                >
+                                                    <div className="absolute -left-[5px] top-1.5 w-2 h-2 rounded-full bg-[#d1d5db]" />
+                                                    <div className="flex justify-between items-baseline mb-0.5">
+                                                        <h3
+                                                            className="text-[#3e3e3e] text-sm"
+                                                            style={{ fontWeight: "500" }}
+                                                        >
+                                                            {exp.title}
+                                                        </h3>
+                                                        <span className="text-[10px] font-medium text-[#3e3e3e] whitespace-nowrap ml-2">
+                                                            {exp.startDate} /{" "}
+                                                            {exp.current ? "Present" : exp.endDate}
+                                                        </span>
+                                                    </div>
+                                                    <div className="text-[12px] font-medium mb-1 text-[#008cff]">
+                                                        {exp.company} • {exp.location}
+                                                    </div>
+                                                    {renderDescription(exp.description, exp.bulletStyle)}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Education */}
+                                {resumeData.education.length > 0 && (
+                                    <section>
+                                        <h2
+                                            className="text-[16px] uppercase tracking-wider mb-2 text-[#3e3e3e] border-b border-[#e5e7eb]"
+                                            style={{ fontWeight: "500" }}
+                                        >
+                                            Education
+                                        </h2>
+                                        <div className="space-y-3">
+                                            {resumeData.education.map((edu) => (
+                                                <div
+                                                    key={edu.id}
+                                                    className="border-b border-[#f3f4f6] pb-2 last:border-0 last:pb-0"
+                                                >
+                                                    <div className="flex justify-between items-baseline mb-0.5">
+                                                        <h3
+                                                            className="text-[#3e3e3e] text-[14px]"
+                                                            style={{ fontWeight: "500" }}
+                                                        >
+                                                            {edu.degree}
+                                                        </h3>
+                                                        <span className="text-[10px] font-medium text-[#3e3e3e] whitespace-nowrap ml-2">
+                                                            {edu.startDate} /{" "}
+                                                            {edu.current ? "Present" : edu.endDate}
+                                                        </span>
+                                                    </div>
+                                                    <div className="text-[12px] font-medium text-[#008cff]">
+                                                        {edu.school}, {edu.location}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Projects */}
+                                {resumeData.projects.length > 0 && (
+                                    <section>
+                                        <h2
+                                            className="text-[16px] uppercase tracking-wider mb-2 text-[#3e3e3e] border-b border-[#e5e7eb]"
+                                            style={{ fontWeight: "500" }}
+                                        >
+                                            Projects
+                                        </h2>
+                                        <div className="space-y-3">
+                                            {resumeData.projects.map((project) => (
+                                                <div key={project.id}>
+                                                    <div className="flex justify-between items-baseline mb-0.5">
+                                                        <h3
+                                                            className="text-[#3e3e3e] text-sm flex items-center gap-2"
+                                                            style={{ fontWeight: "500" }}
+                                                        >
+                                                            {project.name}
+                                                            {project.link && (
+                                                                <a
+                                                                    href={project.link}
+                                                                    target="_blank"
+                                                                    rel="noreferrer"
+                                                                    className="text-[#e5e7eb] hover:text-[#4b5563]"
+                                                                >
+                                                                    <ExternalLink className="w-3 h-3" />
+                                                                </a>
+                                                            )}
+                                                        </h3>
+                                                        <span className="text-[10px] font-medium text-[#3e3e3e] whitespace-nowrap ml-2">
+                                                            {project.date}
+                                                        </span>
+                                                    </div>
+                                                    {project.link && (
+                                                        <a
+                                                            href={project.link}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            className="text-[12px] block mb-1 hover:underline text-[#008cff] line-clamp-1"
+                                                        >
+                                                            {project.link}
+                                                        </a>
+                                                    )}
+                                                    <p className="text-[#3e3e3e] text-[12px] whitespace-pre-line leading-relaxed">
+                                                        {project.description}
+                                                    </p>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
                             </div>
 
-                            {/* Strengths */}
-                            {resumeData.strengths.length > 0 && (
-                                <section>
-                                    <h2
-                                        className="text-[16px] uppercase tracking-wider mb-3 border-b border-[rgba(255,255,255,0.2)] pb-1 text-[rgba(255,255,255,0.9)]"
-                                        style={{ fontWeight: "500" }}
+                            {/* Right Column - Sidebar */}
+                            <div
+                                className="w-[35%] text-[#ffffff] p-6 flex flex-col gap-6 relative min-h-full h-full"
+                                style={{ backgroundColor: settings.themeColor }}
+                            >
+                                {/* Profile Photo */}
+                                <div
+                                    className="absolute top-0 left-0 h-4 w-full"
+                                    style={{
+                                        background: darkenColor(settings.themeColor, 0.7),
+                                    }}
+                                />
+                                <div className="flex justify-center">
+                                    <div
+                                        className="w-24 h-24 rounded-full mt-2 bg-[#e5e7eb] border-3 border-[#ffffff] overflow-hidden flex items-center justify-center"
+                                        style={{
+                                            boxShadow:
+                                                "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+                                        }}
                                     >
-                                        Strengths
-                                    </h2>
-                                    <div className="space-y-3">
-                                        {resumeData.strengths.map((strength) => (
-                                            <div key={strength.id} className="flex gap-2">
-                                                {(() => {
-                                                    const Icon = strength.icon
-                                                        ? getIconComponent(strength.icon)
-                                                        : null;
-                                                    return Icon ? (
-                                                        <Icon className="size-7 text-[#ffffff] shrink-0 mt-0.5 bg-[rgba(255,255,255,0.2)] p-1.5 rounded-md" />
-                                                    ) : null;
-                                                })()}
-                                                <div>
-                                                    <h3
-                                                        className="text-[12px] mb-0.5 text-[#ffffff]"
-                                                        style={{ fontWeight: "500" }}
-                                                    >
-                                                        {strength.title}
-                                                    </h3>
-                                                    <p className="text-[rgba(255,255,255,0.8)] text-[10px] leading-relaxed">
-                                                        {strength.description}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        ))}
+                                        {resumeData.personalInfo.photoUrl ? (
+                                            <Image
+                                                src={resumeData.personalInfo.photoUrl}
+                                                alt={resumeData.personalInfo.fullName}
+                                                className="w-full h-full object-cover"
+                                                width={112}
+                                                height={112}
+                                            />
+                                        ) : (
+                                            <User className="w-24 h-24 text-[#9ca3af]" />
+                                        )}
                                     </div>
-                                </section>
-                            )}
+                                </div>
 
-                            {/* Skills */}
-                            {resumeData.skills.length > 0 && (
-                                <section>
-                                    <h2
-                                        className="text-[16px] uppercase tracking-wider mb-3 border-b border-[rgba(255,255,255,0.2)] pb-1 text-[rgba(255,255,255,0.9)]"
-                                        style={{ fontWeight: "500" }}
-                                    >
-                                        Skills
-                                    </h2>
-                                    <div className="flex flex-wrap gap-2">
-                                        {resumeData.skills.map((skill) => (
-                                            <span
-                                                key={skill.id}
-                                                className="bg-[rgba(255,255,255,0.2)] px-2 py-1 rounded-md text-[12px] text-[#ffffff] font-semibold"
-                                            >
-                                                {skill.name}
-                                            </span>
-                                        ))}
-                                    </div>
-                                </section>
-                            )}
-
-                            {/* Find Me Online */}
-                            {resumeData.socials.length > 0 && (
-                                <section>
-                                    <h2
-                                        className="text-[16px] uppercase tracking-wider mb-3 border-b border-[rgba(255,255,255,0.2)] pb-1 text-[rgba(255,255,255,0.9)]"
-                                        style={{ fontWeight: "500" }}
-                                    >
-                                        Find Me Online
-                                    </h2>
-                                    <div className="space-y-2">
-                                        {resumeData.socials.map((social) => (
-                                            <a
-                                                key={social.id}
-                                                href={social.url}
-                                                target="_blank"
-                                                rel="noreferrer"
-                                                className="flex items-center gap-2 text-xs text-[rgba(255,255,255,0.9)] hover:text-[#ffffff] transition-colors group"
-                                            >
-                                                <div className="bg-[rgba(255,255,255,0.2)] p-1.5 rounded-md group-hover:bg-[rgba(255,255,255,0.3)] transition-colors">
-                                                    {getSocialIcon(social)}
-                                                </div>
-                                                <div>
-                                                    <div
-                                                        className="text-[#ffffff] text-[11px]"
-                                                        style={{ fontWeight: "500" }}
-                                                    >
-                                                        {social.platform}
-                                                    </div>
-                                                    <div className="text-[10px] truncate max-w-[120px] opacity-80">
-                                                        {social.username || "Link"}
+                                {/* Strengths */}
+                                {resumeData.strengths.length > 0 && (
+                                    <section>
+                                        <h2
+                                            className="text-[16px] uppercase tracking-wider mb-3 border-b border-[rgba(255,255,255,0.2)] pb-1 text-[rgba(255,255,255,0.9)]"
+                                            style={{ fontWeight: "500" }}
+                                        >
+                                            Strengths
+                                        </h2>
+                                        <div className="space-y-3">
+                                            {resumeData.strengths.map((strength) => (
+                                                <div key={strength.id} className="flex gap-2">
+                                                    {(() => {
+                                                        const Icon = strength.icon
+                                                            ? getIconComponent(strength.icon)
+                                                            : null;
+                                                        return Icon ? (
+                                                            <Icon className="size-7 text-[#ffffff] shrink-0 mt-0.5 bg-[rgba(255,255,255,0.2)] p-1.5 rounded-md" />
+                                                        ) : null;
+                                                    })()}
+                                                    <div>
+                                                        <h3
+                                                            className="text-[12px] mb-0.5 text-[#ffffff]"
+                                                            style={{ fontWeight: "500" }}
+                                                        >
+                                                            {strength.title}
+                                                        </h3>
+                                                        <p className="text-[rgba(255,255,255,0.8)] text-[10px] leading-relaxed">
+                                                            {strength.description}
+                                                        </p>
                                                     </div>
                                                 </div>
-                                            </a>
-                                        ))}
-                                    </div>
-                                </section>
-                            )}
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
 
-                            {/* Languages */}
-                            {resumeData.languages.length > 0 && (
-                                <section>
-                                    <h2
-                                        className="text-[16px] uppercase tracking-wider mb-3 border-b border-[rgba(255,255,255,0.2)] pb-1 text-[rgba(255,255,255,0.9)]"
-                                        style={{ fontWeight: "500" }}
-                                    >
-                                        Languages
-                                    </h2>
-                                    <div className="space-y-2">
-                                        {resumeData.languages.map((lang) => (
-                                            <div
-                                                key={lang.id}
-                                                className="flex items-center justify-between text-xs"
-                                            >
-                                                <div className="flex flex-col">
-                                                    <span className="font-medium text-[#ffffff]">
-                                                        {lang.name}
-                                                    </span>
-                                                    <span className="text-[10px] text-[rgba(255,255,255,0.7)]">
-                                                        {lang.proficiency}
-                                                    </span>
-                                                </div>
-                                                <div className="flex gap-1">
-                                                    {[1, 2, 3, 4, 5].map((i) => {
-                                                        const level = lang.proficiency.includes("Native")
-                                                            ? 5
-                                                            : lang.proficiency.includes("Fluent")
-                                                                ? 4
-                                                                : lang.proficiency.includes("Proficient")
-                                                                    ? 3
-                                                                    : lang.proficiency.includes("Intermediate")
-                                                                        ? 2
-                                                                        : 1;
-                                                        return (
-                                                            <div
-                                                                key={i}
-                                                                className={`w-1.25 h-4 rounded-sm ${i <= level ? "bg-[#ffffff]" : "bg-[rgba(255,255,255,0.2)]"}`}
-                                                            />
-                                                        );
-                                                    })}
-                                                </div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </section>
-                            )}
-
-                            {/* Certifications */}
-                            {resumeData.certifications.length > 0 && (
-                                <section>
-                                    <h2
-                                        className="text-[16px] uppercase tracking-wider mb-3 border-b border-[rgba(255,255,255,0.2)] pb-1 text-[rgba(255,255,255,0.9)]"
-                                        style={{ fontWeight: "500" }}
-                                    >
-                                        Certification
-                                    </h2>
-                                    <div className="space-y-3">
-                                        {resumeData.certifications.map((cert) => (
-                                            <div key={cert.id}>
-                                                <h3
-                                                    className="text-xs mb-0.5 text-[#ffffff]"
-                                                    style={{ fontWeight: "500" }}
+                                {/* Skills */}
+                                {resumeData.skills.length > 0 && (
+                                    <section>
+                                        <h2
+                                            className="text-[16px] uppercase tracking-wider mb-3 border-b border-[rgba(255,255,255,0.2)] pb-1 text-[rgba(255,255,255,0.9)]"
+                                            style={{ fontWeight: "500" }}
+                                        >
+                                            Skills
+                                        </h2>
+                                        <div className="flex flex-wrap gap-2">
+                                            {resumeData.skills.map((skill) => (
+                                                <span
+                                                    key={skill.id}
+                                                    className="bg-[rgba(255,255,255,0.2)] px-2 py-1 rounded-md text-[12px] text-[#ffffff] font-semibold"
                                                 >
-                                                    {cert.name}
-                                                </h3>
-                                                <p className="text-[rgba(255,255,255,0.8)] text-[12px]">
-                                                    {cert.issuer}{" "}
-                                                    <a
-                                                        href={cert.link}
-                                                        target="_blank"
-                                                        rel="noreferrer"
-                                                        className="underline hover:text-[#ffffff]"
+                                                    {skill.name}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Find Me Online */}
+                                {resumeData.socials.length > 0 && (
+                                    <section>
+                                        <h2
+                                            className="text-[16px] uppercase tracking-wider mb-3 border-b border-[rgba(255,255,255,0.2)] pb-1 text-[rgba(255,255,255,0.9)]"
+                                            style={{ fontWeight: "500" }}
+                                        >
+                                            Find Me Online
+                                        </h2>
+                                        <div className="space-y-2">
+                                            {resumeData.socials.map((social) => (
+                                                <a
+                                                    key={social.id}
+                                                    href={social.url}
+                                                    target="_blank"
+                                                    rel="noreferrer"
+                                                    className="flex items-center gap-2 text-xs text-[rgba(255,255,255,0.9)] hover:text-[#ffffff] transition-colors group"
+                                                >
+                                                    <div className="bg-[rgba(255,255,255,0.2)] p-1.5 rounded-md group-hover:bg-[rgba(255,255,255,0.3)] transition-colors">
+                                                        {getSocialIcon(social)}
+                                                    </div>
+                                                    <div>
+                                                        <div
+                                                            className="text-[#ffffff] text-[11px]"
+                                                            style={{ fontWeight: "500" }}
+                                                        >
+                                                            {social.platform}
+                                                        </div>
+                                                        <div className="text-[10px] truncate max-w-[120px] opacity-80">
+                                                            {social.username || "Link"}
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Languages */}
+                                {resumeData.languages.length > 0 && (
+                                    <section>
+                                        <h2
+                                            className="text-[16px] uppercase tracking-wider mb-3 border-b border-[rgba(255,255,255,0.2)] pb-1 text-[rgba(255,255,255,0.9)]"
+                                            style={{ fontWeight: "500" }}
+                                        >
+                                            Languages
+                                        </h2>
+                                        <div className="space-y-2">
+                                            {resumeData.languages.map((lang) => (
+                                                <div
+                                                    key={lang.id}
+                                                    className="flex items-center justify-between text-xs"
+                                                >
+                                                    <div className="flex flex-col">
+                                                        <span className="font-medium text-[#ffffff]">
+                                                            {lang.name}
+                                                        </span>
+                                                        <span className="text-[10px] text-[rgba(255,255,255,0.7)]">
+                                                            {lang.proficiency}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex gap-1">
+                                                        {[1, 2, 3, 4, 5].map((i) => {
+                                                            const level = lang.proficiency.includes("Native")
+                                                                ? 5
+                                                                : lang.proficiency.includes("Fluent")
+                                                                    ? 4
+                                                                    : lang.proficiency.includes("Proficient")
+                                                                        ? 3
+                                                                        : lang.proficiency.includes("Intermediate")
+                                                                            ? 2
+                                                                            : 1;
+                                                            return (
+                                                                <div
+                                                                    key={i}
+                                                                    className={`w-1.25 h-4 rounded-sm ${i <= level ? "bg-[#ffffff]" : "bg-[rgba(255,255,255,0.2)]"}`}
+                                                                />
+                                                            );
+                                                        })}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+
+                                {/* Certifications */}
+                                {resumeData.certifications.length > 0 && (
+                                    <section>
+                                        <h2
+                                            className="text-[16px] uppercase tracking-wider mb-3 border-b border-[rgba(255,255,255,0.2)] pb-1 text-[rgba(255,255,255,0.9)]"
+                                            style={{ fontWeight: "500" }}
+                                        >
+                                            Certification
+                                        </h2>
+                                        <div className="space-y-3">
+                                            {resumeData.certifications.map((cert) => (
+                                                <div key={cert.id}>
+                                                    <h3
+                                                        className="text-xs mb-0.5 text-[#ffffff]"
+                                                        style={{ fontWeight: "500" }}
                                                     >
-                                                        <ExternalLink className="w-3 h-3 inline-block ml-1" />
-                                                    </a>
-                                                </p>
-                                                {cert.description && (
-                                                    <p className="text-[rgba(255,255,255,0.7)] text-[10px] mt-1 leading-relaxed">
-                                                        {cert.description}
+                                                        {cert.name}
+                                                    </h3>
+                                                    <p className="text-[rgba(255,255,255,0.8)] text-[12px]">
+                                                        {cert.issuer}{" "}
+                                                        <a
+                                                            href={cert.link}
+                                                            target="_blank"
+                                                            rel="noreferrer"
+                                                            className="underline hover:text-[#ffffff]"
+                                                        >
+                                                            <ExternalLink className="w-3 h-3 inline-block ml-1" />
+                                                        </a>
                                                     </p>
-                                                )}
-                                            </div>
-                                        ))}
-                                    </div>
-                                </section>
-                            )}
+                                                    {cert.description && (
+                                                        <p className="text-[rgba(255,255,255,0.7)] text-[10px] mt-1 leading-relaxed">
+                                                            {cert.description}
+                                                        </p>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </section>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );

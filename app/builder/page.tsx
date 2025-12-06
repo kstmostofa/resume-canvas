@@ -1,12 +1,15 @@
 "use client";
 
 import { ResumeEditor } from "@/components/builder/editor/resume-editor";
+import { RenderResume } from "@/components/builder/preview/render-resume";
 import { ResumePreview } from "@/components/builder/preview/resume-preview";
 import { useResumeStore } from "@/lib/store/useResumeStore";
+import { PDFViewer } from "@react-pdf/renderer";
 import { FileText } from "lucide-react";
+import dynamic from "next/dynamic";
 
 export default function BuilderPage() {
-  const { _hasHydrated } = useResumeStore();
+  const { _hasHydrated, settings, resumeData } = useResumeStore();
 
   if (!_hasHydrated) {
     return (
@@ -26,7 +29,13 @@ export default function BuilderPage() {
       </div>
     );
   }
-
+  // const PDFViewer = dynamic(
+  //   () => import("@react-pdf/renderer").then((mod) => mod.PDFViewer),
+  //   {
+  //     ssr: false,
+  //     loading: () => <p>Loading PDF Viewer...</p>,
+  //   },
+  // );
   return (
     <main className="flex h-screen w-full overflow-hidden">
       {/* Left Panel - Editor */}
@@ -37,6 +46,12 @@ export default function BuilderPage() {
       {/* Right Panel - Preview */}
       <div className="w-1/2 h-full bg-muted border-l border-border">
         <ResumePreview />
+        {/* <RenderResume settings={settings} resumeData={resumeData} /> */}
+        {/* <div className="h-full w-full shadow-2xl">
+          <PDFViewer className="w-full h-full" showToolbar={true}>
+            <RenderResume resumeData={resumeData} settings={settings} />
+          </PDFViewer>
+        </div> */}
       </div>
     </main>
   );
