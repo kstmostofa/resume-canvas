@@ -43,219 +43,43 @@ Font.register({
     ],
 });
 
-const styles = StyleSheet.create({
-    page: {
-        flexDirection: "row",
-        backgroundColor: "#ffffff",
-        fontFamily: "Khand",
-    },
-    leftColumn: {
-        width: "65%",
-        paddingLeft: 20,
-        paddingTop: 12,
-        paddingRight: 12,
-        display: "flex",
-        flexDirection: "column",
-        gap: 6,
-    },
-    rightColumn: {
-        width: "35%",
-        paddingLeft: 12,
-        paddingTop: 16,
-        paddingRight: 12,
-        display: "flex",
-        flexDirection: "column",
-        gap: 6,
-        color: "#ffffff",
-        minHeight: "100%",
-    },
-    header: {
-        marginBottom: 0,
-    },
-    name: {
-        fontSize: 24,
-        textTransform: "uppercase",
-        color: "#3e3e3e",
-        fontWeight: 500,
-        letterSpacing: 0,
-        padding: 0,
-        lineHeight: 1.2,
-    },
-    title: {
-        fontSize: 12,
-        color: "#008cff",
-        fontWeight: 500,
-        marginBottom: 2,
-        marginTop: 0,
-    },
-    contactInfo: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        columnGap: 8,
-        fontSize: 10,
-        color: "#3e3e3e",
-    },
-    contactItem: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 4,
-    },
-    section: {
-        marginBottom: 0,
-    },
-    sectionTitle: {
-        fontSize: 12,
-        textTransform: "uppercase",
-        letterSpacing: 1,
-        marginBottom: 4,
-        color: "#3e3e3e",
-        borderBottomWidth: 1,
-        borderBottomColor: "#e5e7eb",
-        paddingBottom: 4,
-        fontWeight: 500,
-    },
-    sectionTitleRight: {
-        fontSize: 12,
-        textTransform: "uppercase",
-        letterSpacing: 1,
-        marginBottom: 6,
-        color: "rgba(255,255,255,0.9)",
-        borderBottomWidth: 1,
-        borderBottomColor: "#E5E5E5",
-        paddingBottom: 0,
-        fontWeight: 500,
-    },
-    text: {
-        fontSize: 10,
-        color: "#3e3e3e",
-        lineHeight: 1.5,
-        textAlign: "justify",
-    },
-    textRight: {
-        fontSize: 8,
-        color: "rgba(255,255,255,0.8)",
-        lineHeight: 1.5,
-    },
-    experienceItem: {
-        paddingLeft: 12,
-        marginTop: 4,
-        borderLeftWidth: 2,
-        borderLeftColor: "#e5e7eb",
-        marginLeft: 4,
-        position: "relative",
-        marginBottom: 12,
-    },
-    experienceDot: {
-        position: "absolute",
-        left: -5,
-        top: 6,
-        width: 8,
-        height: 8,
-        borderRadius: 4,
-        backgroundColor: "#d1d5db",
-    },
-    jobHeader: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-end",
-        marginBottom: 0,
-    },
-    jobTitle: {
-        fontSize: 12,
-        color: "#3e3e3e",
-        fontWeight: 500,
-    },
-    date: {
-        fontSize: 10,
-        color: "#3e3e3e",
-        fontWeight: 500,
-    },
-    company: {
-        fontSize: 10,
-        color: "#008cff",
-        fontWeight: 500,
-        marginBottom: 0,
-    },
-    educationItem: {
-        borderBottomWidth: 1,
-        borderBottomColor: "#f3f4f6",
-        paddingBottom: 4,
-        marginBottom: 4,
-    },
-    photoContainer: {
-        alignItems: "center",
-        marginBottom: 8,
-    },
-    photo: {
-        width: 75,
-        height: 75,
-        borderRadius: 48,
-        borderWidth: 3,
-        border: "3px solid #ffffff",
-        borderColor: "#ffffff",
-        objectFit: "cover",
-    },
-    skillBadge: {
-        backgroundColor: "rgba(255,255,255,0.2)",
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 6,
-        fontSize: 9,
-        color: "#ffffff",
-        fontWeight: 500,
-    },
-    skillsContainer: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        gap: 4,
-    },
-    socialItem: {
-        flexDirection: "row",
-        alignItems: "center",
-        gap: 6,
-        marginBottom: 4,
-    },
-    socialIconBox: {
-        backgroundColor: "rgba(255,255,255,0.2)",
-        padding: 6,
-        borderRadius: 6,
-        height: 24,
-        width: 24,
-    },
-    languageItem: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        marginBottom: 2,
-        fontSize: 10,
-    },
-    progressBar: {
-        flexDirection: "row",
-        gap: 4,
-    },
-    progressDot: {
-        width: 4,
-        height: 12,
-        borderRadius: 2,
-    },
-    link: {
-        textDecoration: "none",
-        color: "#3e3e3e",
-        fontSize: 10,
-    },
+Font.register({
+    family: "Inter",
+    fonts: [
+        {
+            src: "/fonts/Inter.ttf",
+            fontWeight: 400,
+        },
+        {
+            src: "/fonts/Inter.ttf",
+            fontWeight: 500,
+        },
+        {
+            src: "/fonts/Inter.ttf",
+            fontWeight: 600,
+        },
+        {
+            src: "/fonts/Inter.ttf",
+            fontWeight: 700,
+        },
+    ],
 });
+
+
 
 const PdfIcon = ({
     name,
     size = 12,
     color = "#3e3e3e",
     style,
+    fill = "none",
 }: {
     name: string;
     size?: number;
     color?: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     style?: any;
+    fill?: string;
 }) => {
     let iconNodes = pdfIconPack[name];
 
@@ -303,30 +127,37 @@ const PdfIcon = ({
 
                 if (!Component) return null;
 
-                return <Component key={index} {...attrs} fill="none" />;
+                const { key: _ignoredKey, ...safeAttrs } = attrs || {};
+
+                return <Component key={index} {...safeAttrs} fill={fill} />;
             })}
         </Svg>
     );
 };
 
-// Helper to render bullet points
-const BulletList = ({ items, bulletPoint = "•" }: { items: string[]; bulletPoint?: string }) => (
-    <View style={{ marginTop: 4 }}>
-        {items.map((item, index) => (
-            <View
-                key={index}
-                style={{ flexDirection: "row", marginBottom: 0, paddingLeft: 0, alignItems: "center" }}
-            >
-                <View style={{ marginRight: 6 }}>
-                    <PdfIcon name={bulletPoint} size={4} color="#3e3e3e" style={{ color: "#3e3e3e", backgroundColor: "#3e3e3e", }} />
-                </View>
-                <Text style={{ flex: 1, fontSize: 10, color: "#3e3e3e" }}>
-                    {item}
-                </Text>
-            </View>
-        ))}
-    </View>
-);
+const getBulletIcon = (style: string) => {
+    switch (style) {
+        case "Circle":
+            return <PdfIcon name="Circle" size={4} color="#656565" />;
+        case "Square":
+            return <PdfIcon name="Square" size={5} color="#656565" fill="#656565" />;
+        case "Check":
+            return <PdfIcon name="Check" size={12} color="#656565" fill="#656565" />;
+        case "ArrowRight":
+            return <PdfIcon name="ArrowRight" size={8} color="#656565" />;
+        case "ChevronRight":
+            return <PdfIcon name="ChevronRight" size={12} color="#656565" />;
+        case "Diamond":
+            return <PdfIcon name="Diamond" size={6} color="#656565" fill="#656565" />;
+        case "Star":
+            return <PdfIcon name="Star" size={6} color="#656565" fill="#656565" />;
+        case "Minus":
+            return <PdfIcon name="Minus" size={12} color="#656565" fill="#656565" />;
+        case "default":
+        default:
+            return <PdfIcon name="Dot" size={8} color="#656565" fill="#656565" />;
+    }
+};
 
 export const RenderResume = ({
     resumeData,
@@ -336,7 +167,207 @@ export const RenderResume = ({
     settings: ResumeSettings;
 }) => {
     const isLetter = settings.documentSize === "Letter";
-
+    const styles = StyleSheet.create({
+        page: {
+            flexDirection: "row",
+            backgroundColor: "#ffffff",
+            fontFamily: settings.fontFamily || "Inter",
+        },
+        leftColumn: {
+            width: "65%",
+            paddingLeft: 20,
+            paddingTop: 12,
+            paddingRight: 12,
+            display: "flex",
+            flexDirection: "column",
+            gap: 6,
+        },
+        rightColumn: {
+            width: "35%",
+            paddingLeft: 12,
+            paddingTop: 16,
+            paddingRight: 12,
+            display: "flex",
+            flexDirection: "column",
+            gap: 6,
+            color: "#ffffff",
+            minHeight: "100%",
+        },
+        header: {
+            marginBottom: 0,
+        },
+        name: {
+            fontSize: 24,
+            textTransform: "uppercase",
+            color: "#3e3e3e",
+            fontWeight: 500,
+            letterSpacing: 0,
+            padding: 0,
+            lineHeight: 1.2,
+        },
+        title: {
+            fontSize: 12,
+            color: "#008cff",
+            fontWeight: 500,
+            marginBottom: 2,
+            marginTop: 0,
+        },
+        contactInfo: {
+            flexDirection: "row",
+            flexWrap: "wrap",
+            columnGap: 8,
+            fontSize: 10,
+            color: "#3e3e3e",
+        },
+        contactItem: {
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 4,
+        },
+        section: {
+            marginBottom: 0,
+        },
+        sectionTitle: {
+            fontSize: 12,
+            textTransform: "uppercase",
+            letterSpacing: 1,
+            marginBottom: 4,
+            color: "#3e3e3e",
+            borderBottomWidth: 1,
+            borderBottomColor: "#e5e7eb",
+            paddingBottom: 4,
+            fontWeight: 500,
+        },
+        sectionTitleRight: {
+            fontSize: 12,
+            textTransform: "uppercase",
+            letterSpacing: 1,
+            marginBottom: 6,
+            color: "rgba(255,255,255,0.9)",
+            borderBottomWidth: 1,
+            borderBottomColor: "#E5E5E5",
+            paddingBottom: 0,
+            fontWeight: 500,
+        },
+        text: {
+            fontSize: 10,
+            color: "#3e3e3e",
+            lineHeight: 1.5,
+            textAlign: "justify",
+        },
+        textRight: {
+            fontSize: 8,
+            color: "rgba(255,255,255,0.8)",
+            lineHeight: 1.5,
+        },
+        experienceItem: {
+            paddingLeft: 12,
+            marginTop: 4,
+            borderLeftWidth: 2,
+            borderLeftColor: "#e5e7eb",
+            marginLeft: 4,
+            position: "relative",
+            marginBottom: 12,
+        },
+        experienceDot: {
+            position: "absolute",
+            left: -5,
+            top: 6,
+            width: 8,
+            height: 8,
+            borderRadius: 4,
+            backgroundColor: "#d1d5db",
+        },
+        jobHeader: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "flex-end",
+            marginBottom: 0,
+        },
+        jobTitle: {
+            fontSize: 12,
+            color: "#3e3e3e",
+            fontWeight: 500,
+        },
+        date: {
+            fontSize: 10,
+            color: "#3e3e3e",
+            fontWeight: 500,
+        },
+        company: {
+            fontSize: 10,
+            color: "#008cff",
+            fontWeight: 500,
+            marginBottom: 0,
+        },
+        educationItem: {
+            borderBottomWidth: 1,
+            borderBottomColor: "#f3f4f6",
+            paddingBottom: 4,
+            marginBottom: 4,
+        },
+        photoContainer: {
+            alignItems: "center",
+            marginBottom: 8,
+        },
+        photo: {
+            width: 75,
+            height: 75,
+            borderRadius: 48,
+            borderWidth: 3,
+            border: "3px solid #ffffff",
+            borderColor: "#ffffff",
+            objectFit: "cover",
+        },
+        skillBadge: {
+            backgroundColor: "rgba(255,255,255,0.2)",
+            paddingHorizontal: 8,
+            paddingVertical: 4,
+            borderRadius: 6,
+            fontSize: 9,
+            color: "#ffffff",
+            fontWeight: 500,
+        },
+        skillsContainer: {
+            flexDirection: "row",
+            flexWrap: "wrap",
+            gap: 4,
+        },
+        socialItem: {
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 6,
+            marginBottom: 4,
+        },
+        socialIconBox: {
+            backgroundColor: "rgba(255,255,255,0.2)",
+            padding: 6,
+            borderRadius: 6,
+            height: 24,
+            width: 24,
+        },
+        languageItem: {
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            marginBottom: 2,
+            fontSize: 10,
+        },
+        progressBar: {
+            flexDirection: "row",
+            gap: 4,
+        },
+        progressDot: {
+            width: 4,
+            height: 12,
+            borderRadius: 2,
+        },
+        link: {
+            textDecoration: "none",
+            color: "#3e3e3e",
+            fontSize: 10,
+        },
+    });
     return (
         <Document author="Resume Canvas" producer="Resume Canvas">
             <Page
@@ -448,18 +479,31 @@ export const RenderResume = ({
                                     <Text style={styles.company}>
                                         {exp.company} • {exp.location}
                                     </Text>
-                                    {exp.description ? (
-                                        exp.bulletStyle && exp.bulletStyle !== "none" ? (
-                                            <BulletList
-                                                items={exp.description
-                                                    .split("\n")
-                                                    .filter((i) => i.trim().length > 0)}
-                                                bulletPoint={exp.bulletStyle || "•"}
-                                            />
-                                        ) : (
-                                            <Text style={styles.text}>{exp.description}</Text>
-                                        )
+                                    {exp.description && exp.bulletStyle && exp.bulletStyle !== "none" ? (
+                                        exp.description
+                                            .split("\n")
+                                            .filter((i) => i.trim().length > 0)
+                                            .map((item, index) => (
+                                                <View
+                                                    key={index}
+                                                    style={{
+                                                        flexDirection: "row",
+                                                        marginBottom: 0,
+                                                        paddingLeft: 0,
+                                                        alignItems: "center",
+                                                    }}
+                                                >
+                                                    <View style={{ marginRight: 6 }}>
+                                                        {getBulletIcon(exp.bulletStyle || "Dot")}
+                                                    </View>
+
+                                                    <Text style={{ flex: 1, fontSize: 10, color: "#3e3e3e" }}>
+                                                        {item}
+                                                    </Text>
+                                                </View>
+                                            ))
                                     ) : null}
+
                                 </View>
                             ))}
                         </View>
@@ -585,7 +629,11 @@ export const RenderResume = ({
                                         >
                                             {strength.title}
                                         </Text>
-                                        <Text style={styles.textRight}>
+                                        <Text style={{
+                                            fontSize: 9,
+                                            color: "rgba(255,255,255,0.8)",
+                                            lineHeight: 1.2,
+                                        }}>
                                             {strength.description}
                                         </Text>
                                     </View>
@@ -729,7 +777,7 @@ export const RenderResume = ({
                                     <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
                                         <Text
                                             style={{
-                                                fontSize: 8,
+                                                fontSize: 9,
                                                 color: "rgba(255,255,255,0.8)",
                                             }}
                                         >
@@ -744,7 +792,7 @@ export const RenderResume = ({
                                     {cert.description && (
                                         <Text
                                             style={{
-                                                fontSize: 8,
+                                                fontSize: 9,
                                                 color: "rgba(255,255,255,0.7)",
                                                 marginTop: 4,
                                                 lineHeight: 1.4,

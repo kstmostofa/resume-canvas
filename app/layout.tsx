@@ -23,9 +23,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${khand.variable} font-sans antialiased`}>
-        {/* <ThemeProvider attribute="class" defaultTheme="dark"> */}
-        {children}
-        {/* </ThemeProvider> */}
+        <ThemeProvider attribute="class" defaultTheme="dark">
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

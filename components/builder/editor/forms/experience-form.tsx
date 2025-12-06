@@ -22,16 +22,16 @@ import { useResumeStore } from "@/lib/store/useResumeStore";
 import { Plus, Trash2 } from "lucide-react";
 
 const BULLET_STYLES = [
-  { label: "Default (•)", value: "default" },
-  { label: "Circle (○)", value: "circle" },
-  { label: "Square (■)", value: "square" },
-  { label: "Diamond (◆)", value: "diamond" },
-  { label: "Star (★)", value: "star" },
-  { label: "Dash (-)", value: "minus" },
-  { label: "Check (✓)", value: "check" },
-  { label: "Arrow (→)", value: "arrow" },
-  { label: "Chevron (›)", value: "chevron" },
-  { label: "None", value: "none" },
+  { label: "Default (•)", value: "Dot" },
+  { label: "Circle (○)", value: "Circle" },
+  { label: "Square (■)", value: "Square" },
+  { label: "Diamond (◆)", value: "Diamond" },
+  { label: "Star (★)", value: "Star" },
+  { label: "Dash (-)", value: "Minus" },
+  { label: "Check (✓)", value: "Check" },
+  { label: "Arrow (→)", value: "ArrowRight" },
+  { label: "Chevron (›)", value: "ChevronRight" },
+  { label: "None", value: "None" },
 ];
 
 export function ExperienceForm() {

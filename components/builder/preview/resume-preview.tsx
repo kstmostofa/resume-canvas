@@ -24,6 +24,7 @@ import {
     Minus,
     Moon,
     Sun,
+    Dot,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useResumeStore } from "@/lib/store/useResumeStore";
@@ -32,15 +33,15 @@ import Image from "next/image";
 import { darkenColor } from "@/lib/utils";
 import { Social } from "@/lib/types";
 import { RenderResume } from "./render-resume";
-import dynamic from "next/dynamic";
+import { PDFViewer } from "@react-pdf/renderer";
 
-const PDFViewer = dynamic(
-    () => import("@react-pdf/renderer").then((mod) => mod.PDFViewer),
-    {
-        ssr: false,
-        loading: () => <p>Loading PDF Viewer...</p>,
-    },
-);
+// const PDFViewer = dynamic(
+//     () => import("@react-pdf/renderer").then((mod) => mod.PDFViewer),
+//     {
+//         ssr: false,
+//         loading: () => <p>Loading PDF Viewer...</p>,
+//     },
+// );
 
 export function ResumePreview() {
     const { resumeData, settings } = useResumeStore();
@@ -48,7 +49,7 @@ export function ResumePreview() {
     const contentRef = useRef<HTMLDivElement>(null);
     const [isDownloading, setIsDownloading] = useState(false);
     const [downloadProgress, setDownloadProgress] = useState(0);
-    const [showPdf, setShowPdf] = useState(true);
+    const [showPdf, setShowPdf] = useState(false);
 
     const reactToPrintFn = useReactToPrint({
         contentRef,
@@ -129,25 +130,25 @@ export function ResumePreview() {
 
     const getBulletIcon = (style: string) => {
         switch (style) {
-            case "circle":
+            case "Circle":
                 return <Circle className="w-1.5 h-1.5" />; // Hollow circle
-            case "square":
+            case "Square":
                 return <Square className="w-1.5 h-1.5 fill-current" />; // Filled square
-            case "check":
+            case "Check":
                 return <Check className="w-3 h-3" />;
-            case "arrow":
+            case "ArrowRight":
                 return <ArrowRight className="w-3 h-3" />;
-            case "chevron":
+            case "ChevronRight":
                 return <ChevronRight className="w-3 h-3" />;
-            case "diamond":
+            case "Diamond":
                 return <Diamond className="w-2 h-2 fill-current" />;
-            case "star":
+            case "Star":
                 return <Star className="w-2.5 h-2.5 fill-current" />;
-            case "minus":
+            case "Minus":
                 return <Minus className="w-3 h-3" />;
             case "default":
             default:
-                return <div className="w-1 h-1 rounded-full bg-current" />; // Disc
+                return <Dot className="w-1.5 h-1.5 fill-current" />;
         }
     };
 
@@ -229,7 +230,7 @@ export function ResumePreview() {
                         size="sm"
                         onClick={() => setShowPdf(!showPdf)}
                     >
-                        {showPdf ? "Show HTML" : "Show PDF"}
+                        {showPdf ? "Hide PDF Preview" : "Show PDF Preview"}
                     </Button>
                 </div>
                 <div className="flex gap-2">
@@ -254,7 +255,7 @@ export function ResumePreview() {
             <div className="flex-1 overflow-y-auto p-8 flex justify-center">
                 {showPdf ? (
                     <div className="h-full w-full shadow-2xl">
-                        <PDFViewer className="w-full h-full" showToolbar={false}>
+                        <PDFViewer className="w-full h-full" showToolbar={true}>
                             <RenderResume resumeData={resumeData} settings={settings} />
                         </PDFViewer>
                     </div>
@@ -502,7 +503,7 @@ export function ResumePreview() {
 
                             {/* Right Column - Sidebar */}
                             <div
-                                className="w-[35%] text-[#ffffff] p-6 flex flex-col gap-6 relative min-h-full h-full"
+                                className="w-[35%] text-[#ffffff] p-6 flex flex-col gap-3 relative min-h-full h-full"
                                 style={{ backgroundColor: settings.themeColor }}
                             >
                                 {/* Profile Photo */}
@@ -561,7 +562,7 @@ export function ResumePreview() {
                                                         >
                                                             {strength.title}
                                                         </h3>
-                                                        <p className="text-[rgba(255,255,255,0.8)] text-[10px] leading-relaxed">
+                                                        <p className="text-[rgba(255,255,255,0.8)] text-[11px] leading-relaxed">
                                                             {strength.description}
                                                         </p>
                                                     </div>
