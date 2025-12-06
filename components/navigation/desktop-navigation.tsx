@@ -49,10 +49,11 @@ export const DesktopNavigation = () => {
           key={item.href}
           href={item.href}
           onClick={(e) => handleNavClick(e, item.href)}
-          className={`cursor-pointer rounded-full px-6 py-1 text-base font-medium transition-all duration-300 ${pathname === item.href
+          className={`cursor-pointer rounded-full px-6 py-1 text-base font-medium transition-all duration-300 ${
+            pathname === item.href
               ? "bg-primary text-primary-foreground"
               : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-            }`}
+          }`}
         >
           {item.label}
         </Link>

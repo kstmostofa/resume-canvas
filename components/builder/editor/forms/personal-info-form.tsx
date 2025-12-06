@@ -74,16 +74,27 @@ export function PersonalInfoForm() {
                   Upload Photo
                 </Button>
                 {personalInfo.photoUrl && (
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleRemovePhoto}
-                    className="h-9 text-muted-foreground hover:text-destructive"
-                  >
-                    <Trash2 className="w-4 h-4 mr-2" />
-                    Remove
-                  </Button>
+                  <>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleRemovePhoto}
+                      className="h-9 text-muted-foreground hover:text-destructive hidden md:block"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                      Remove
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleRemovePhoto}
+                      className="h-9 text-muted-foreground hover:text-destructive md:hidden block"
+                    >
+                      <Trash2 className="w-4 h-4 mr-2" />
+                    </Button>
+                  </>
                 )}
               </div>
               <p className="text-[11px] text-muted-foreground">
