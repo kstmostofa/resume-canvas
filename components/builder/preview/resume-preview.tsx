@@ -34,14 +34,6 @@ import { Social } from "@/lib/types";
 import { RenderResume } from "./render-resume";
 import { PDFViewer } from "@react-pdf/renderer";
 
-// const PDFViewer = dynamic(
-//     () => import("@react-pdf/renderer").then((mod) => mod.PDFViewer),
-//     {
-//         ssr: false,
-//         loading: () => <p>Loading PDF Viewer...</p>,
-//     },
-// );
-
 export function ResumePreview() {
     const { resumeData, settings } = useResumeStore();
     const { theme, setTheme } = useTheme();
@@ -255,9 +247,9 @@ export function ResumePreview() {
             </div>
             <div className="border bg-orange-100 border-orange-200 p-4 mt-4 mx-4 rounded-lg block md:hidden">
                 <h4 className="text-md text-center font-medium text-orange-800">
-                    For Mobile device preview, Click
-                    <span className="font-bold px-1">Show PDF Preview</span>
-                    to view the PDF version
+                    For Mobile device,
+                    <span className="font-bold px-1">Rotate Your Device</span>
+                    to view the actual preview!
                 </h4>
             </div>
 
