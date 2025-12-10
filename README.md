@@ -1,36 +1,119 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Resume Canvas 📄
 
-## Getting Started
+<div align="center">
 
-First, run the development server:
+![Resume Canvas Preview](public/preview-light.png)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#tech-stack">Tech Stack</a> •
+  <a href="#getting-started">Getting Started</a> •
+  <a href="#contributing">Contributing</a> •
+  <a href="#license">License</a>
+</p>
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Next.js](https://img.shields.io/badge/Next.js-15-black)
+![React](https://img.shields.io/badge/React-19-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.0-38B2AC)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+</div>
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🚀 Overview
 
-## Learn More
+**Resume Canvas** is a modern, open-source resume builder designed to be simple, fast, and privacy-focused. Build your professional resume in minutes with a real-time preview and export it as a high-quality PDF.
 
-To learn more about Next.js, take a look at the following resources:
+Unlike other resume builders, **Resume Canvas** runs entirely in your browser. Your data never leaves your device unless you choose to share it. No sign-ups, no paywalls, no tracking.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## ✨ Features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **👀 Real-time Preview:** See your changes instantly as you type.
+- **🔒 Privacy First:** All data is stored locally in your browser (Local Storage).
+- **📄 PDF Export:** High-quality, selectable, and ATS-friendly PDF generation using `@react-pdf/renderer`.
+- **🎨 Customization:**
+  - Multiple fonts (Google Fonts integration).
+  - Custom theme colors.
+  - Adjustable font sizes and document margins.
+- **🌗 Dark/Light Mode:** Fully supported dark mode for late-night editing.
+- **📱 Responsive Design:** Edit your resume on the go with a mobile-friendly interface.
+- **🧩 Drag & Drop:** Reorder sections easily (Coming Soon).
 
-## Deploy on Vercel
+## 📸 Screenshots
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+|                             Light Mode                             |                            Dark Mode                             |
+| :----------------------------------------------------------------: | :--------------------------------------------------------------: |
+| <img src="public/preview-light.png" alt="Light Mode" width="400"/> | <img src="public/preview-dark.png" alt="Dark Mode" width="400"/> |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 🛠️ Tech Stack
+
+- **Framework:** [Next.js 15](https://nextjs.org/) (App Router)
+- **Language:** [TypeScript](https://www.typescriptlang.org/)
+- **Styling:** [Tailwind CSS](https://tailwindcss.com/)
+- **UI Components:** [Shadcn/UI](https://ui.shadcn.com/) & [Lucide React](https://lucide.dev/)
+- **State Management:** [Zustand](https://github.com/pmndrs/zustand)
+- **PDF Generation:** [@react-pdf/renderer](https://react-pdf.org/)
+- **Forms:** React Hook Form
+
+## 🏁 Getting Started
+
+Follow these steps to set up the project locally on your machine.
+
+### Prerequisites
+
+- Node.js 18+ installed
+- pnpm (recommended), npm, or yarn
+
+### Installation
+
+1.  **Clone the repository:**
+
+    ```bash
+    git clone https://github.com/kstmostofa/resume-canvas.git
+    cd resume-canvas
+    ```
+
+2.  **Install dependencies:**
+
+    ```bash
+    pnpm install
+    # or
+    npm install
+    ```
+
+3.  **Run the development server:**
+
+    ```bash
+    pnpm dev
+    # or
+    npm run dev
+    ```
+
+4.  **Open your browser:**
+    Navigate to [http://localhost:3000](http://localhost:3000) to see the application running.
+
+## 🤝 Contributing
+
+Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+
+1.  Fork the Project
+2.  Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3.  Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4.  Push to the Branch (`git push origin feature/AmazingFeature`)
+5.  Open a Pull Request
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## 🙏 Acknowledgments
+
+- [Shadcn/UI](https://ui.shadcn.com/) for the beautiful component library.
+- [React PDF](https://react-pdf.org/) for the powerful PDF rendering engine.
+- [Lucide](https://lucide.dev/) for the clean icons.
+
+---
+
+<div align="center">
+  Made with ❤️ by <a href="https://github.com/kstmostofa">Md Mostafijur Rahman</a>
+</div>

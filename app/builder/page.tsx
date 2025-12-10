@@ -43,7 +43,7 @@ export default function BuilderPage() {
             "flex-1 p-3 text-sm font-medium flex items-center justify-center gap-2 border-b-2 transition-colors",
             activeTab === "editor"
               ? "border-primary text-primary"
-              : "border-transparent text-muted-foreground hover:text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground",
           )}
         >
           <PenLine className="w-4 h-4" />
@@ -55,7 +55,7 @@ export default function BuilderPage() {
             "flex-1 p-3 text-sm font-medium flex items-center justify-center gap-2 border-b-2 transition-colors",
             activeTab === "preview"
               ? "border-primary text-primary"
-              : "border-transparent text-muted-foreground hover:text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground",
           )}
         >
           <Eye className="w-4 h-4" />
@@ -79,7 +79,7 @@ export default function BuilderPage() {
       <div
         className={cn(
           "w-full lg:w-1/2 h-full lg:block lg:min-w-[400px]",
-          activeTab === "editor" ? "block" : "hidden"
+          activeTab === "editor" ? "block" : "hidden",
         )}
       >
         <ResumeEditor />
@@ -89,7 +89,7 @@ export default function BuilderPage() {
       <div
         className={cn(
           "w-full lg:w-1/2 h-full bg-muted border-l border-border lg:block",
-          activeTab === "preview" ? "block" : "hidden"
+          activeTab === "preview" ? "block" : "hidden",
         )}
       >
         <ResumePreview />
