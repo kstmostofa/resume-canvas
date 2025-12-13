@@ -11,7 +11,7 @@ const khand = Khand({
 
 export const metadata: Metadata = {
     metadataBase: new URL("https://resumecanvas.site"),
-    title: "Resume Canvas | Open Source Resume Builder | Build Your Resume Fast | Free Open Source Resume Builder",
+    title: "Resume Canvas | Open Source Resume Builder | Free Open Source Resume Builder",
     description:
         "Resume Canvas is a modern, open-source resume builder designed to be simple, fast, and privacy-focused. Build your professional resume in minutes with a real-time preview and export it as a high-quality PDF. Unlike other resume builders, Resume Canvas runs entirely in your browser. Your data never leaves your device unless you choose to share it. No sign-ups, no paywalls, no tracking.",
     keywords: [
@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     ],
     authors: [{name: "Resume Canvas", url: "https://resumecanvas.site"}],
     openGraph: {
-        title: "Resume Canvas | Open Source Resume Builder | Build Your Resume Fast | Free Open Source Resume Builder",
+        title: "Resume Canvas | Open Source Resume Builder | Free Open Source Resume Builder",
         description:
             "Resume Canvas is a modern, open-source resume builder designed to be simple, fast, and privacy-focused. Build your professional resume in minutes with a real-time preview and export it as a high-quality PDF. Unlike other resume builders, Resume Canvas runs entirely in your browser. Your data never leaves your device unless you choose to share it. No sign-ups, no paywalls, no tracking.",
         url: "https://resumecanvas.site",
@@ -63,7 +63,7 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: "summary_large_image",
-        title: "Resume Canvas | Open Source Resume Builder",
+        title: "Resume Canvas | Open Source Resume Builder | Free Open Source Resume Builder",
         description:
             "Create and customize your resume with ease using Resume Canvas, the open-source resume builder.",
         images: ["https://resumecanvas.site/og-image.png"],

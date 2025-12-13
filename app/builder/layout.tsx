@@ -3,7 +3,7 @@ import { Fragment } from "react/jsx-runtime";
 
 export const metadata: Metadata = {
     metadataBase: new URL("https://resumecanvas.site/builder"),
-    title: "Resume Canvas | Open Source Resume Builder | Build Your Resume Fast | Free Open Source Resume Builder",
+    title: "Resume Canvas | Open Source Resume Builder | Free Open Source Resume Builder",
     description:
         "Resume Canvas is a modern, open-source resume builder designed to be simple, fast, and privacy-focused. Build your professional resume in minutes with a real-time preview and export it as a high-quality PDF. Unlike other resume builders, Resume Canvas runs entirely in your browser. Your data never leaves your device unless you choose to share it. No sign-ups, no paywalls, no tracking.",
     keywords: [
@@ -37,17 +37,17 @@ export const metadata: Metadata = {
     ],
     authors: [{name: "Resume Canvas", url: "https://resumecanvas.site"}],
     openGraph: {
-        title: "Resume Canvas | Open Source Resume Builder | Build Your Resume Fast | Free Open Source Resume Builder",
+        title: "Resume Canvas | Open Source Resume Builder | Free Open Source Resume Builder",
         description:
             "Resume Canvas is a modern, open-source resume builder designed to be simple, fast, and privacy-focused. Build your professional resume in minutes with a real-time preview and export it as a high-quality PDF. Unlike other resume builders, Resume Canvas runs entirely in your browser. Your data never leaves your device unless you choose to share it. No sign-ups, no paywalls, no tracking.",
         url: "https://resumecanvas.site/builder",
-        siteName: "Resume Canvas - Free Open Source Resume Builder",
+        siteName: "Resume Canvas | Open Source Resume Builder | Free Open Source Resume Builder",
         images: [
             {
                 url: "https://resumecanvas.site/og-image.png",
                 width: 1200,
                 height: 630,
-                alt: "Resume Canvas - Free Open Source Resume Builder",
+                alt: "Resume Canvas | Open Source Resume Builder | Free Open Source Resume Builder",
             },
         ],
         locale: "en_US",
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: "summary_large_image",
-        title: "Resume Canvas - Free Open Source Resume Builder",
+        title: "Resume Canvas | Open Source Resume Builder | Free Open Source Resume Builder",
         description:
             "Resume Canvas is a modern, open-source resume builder designed to be simple, fast, and privacy-focused. Build your professional resume in minutes with a real-time preview and export it as a high-quality PDF. Unlike other resume builders, Resume Canvas runs entirely in your browser. Your data never leaves your device unless you choose to share it. No sign-ups, no paywalls, no tracking.",
         images: ["https://resumecanvas.site/og-image.png"],
